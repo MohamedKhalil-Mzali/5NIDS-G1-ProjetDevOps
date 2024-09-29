@@ -1,15 +1,22 @@
 pipeline {
     agent any
+
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
+    }
+
     stages {
-        stage('Git') {
+        stage('GIT') {
             steps {
-                git branch: 'WAJDIBENROMDHANE-5NIDS1-G1',
+                git branch: 'Nawelhammami-5NIDS1-G1', 
                 url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
-        stage('Maven') {
+
+        stage('Compile Stage') {
             steps {
-                sh 'mvn clean'
+                sh 'mvn clean compile'
             }
         }
     }
