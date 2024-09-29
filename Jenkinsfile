@@ -10,9 +10,9 @@ pipeline {
 
            steps {
 
-               git branch: 'master',
+               git branch: 'MohamedKhalilMzali-5NIDS1-G1',
 
-               url: ' https://github.com/hwafa/timesheetproject.git'
+               url: ' https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
 
           }
 
