@@ -31,8 +31,8 @@ public class Course implements Serializable {
 	Float price;
 	int timeSlot;
 
-	@JsonIgnore
-	@OneToMany(mappedBy= "course")
-	Set<Registration> registrations;
+	//@JsonIgnore
+	//@OneToMany(mappedBy= "course")
+	//Set<Registration> registrations;
 
 }
