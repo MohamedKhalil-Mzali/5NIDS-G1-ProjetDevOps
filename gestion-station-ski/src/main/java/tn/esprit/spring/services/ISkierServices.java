@@ -25,3 +25,4 @@ public interface ISkierServices {
 	List<Skier> retrieveSkiersBySubscriptionType(TypeSubscription typeSubscription);
 
 }
+
