@@ -24,16 +24,18 @@ pipeline {
             steps {
                 script {
                     def sonarProjectKey = 'nawel'  
-                    def sonarProjectName = 'nawel'  
+                    def sonarProjectName = 'Nawel'  
                     def sonarHostUrl = 'http://192.168.33.10:9000'  
-                    def sonarLogin = 'sqb_1fd79ddeea85094b5dd84f59cc0778457903de54'  // Nouveau token
+                    def sonarToken = 'sqb_1fd79ddeea85094b5dd84f59cc0778457903de54'  // Nouveau token
 
+                    // Exécuter l'analyse SonarQube
                     sh "mvn sonar:sonar -Dsonar.projectKey=${sonarProjectKey} " +
                        "-Dsonar.projectName='${sonarProjectName}' " +
                        "-Dsonar.host.url=${sonarHostUrl} " +
-                       "-Dsonar.login=${sonarLogin}"
+                       "-Dsonar.token=${sonarToken}"
                 }
             }
         }
     }
 }
+
