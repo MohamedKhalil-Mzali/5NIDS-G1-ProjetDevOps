@@ -12,3 +12,5 @@ public interface IRegistrationServices {
 	List<Integer> numWeeksCourseOfInstructorBySupport(Long numInstructor, Support support);
 }
 
+
+
