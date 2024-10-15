@@ -22,12 +22,21 @@ pipeline {
 
         stage('Scan') {
             steps {
-                withSonarQubeEnv(installationName: 'sq1') {
-                    sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                script {
+                    def sonarScript = '''
+                    #!/bin/bash
+                    mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar \
+                      -Dsonar.projectKey=nawel \
+                      -Dsonar.projectName="nawel" \
+                      -Dsonar.host.url=http://192.168.33.10:9000 \
+                      -Dsonar.token=sqb_1fd79ddeea85094b5dd84f59cc0778457903de54
+                    '''
+                    writeFile file: 'sonar_analysis.sh', text: sonarScript
+                    sh 'chmod +x sonar_analysis.sh'
+                    sh './sonar_analysis.sh'
                 }
             }
         }
     }
 }
-
 
