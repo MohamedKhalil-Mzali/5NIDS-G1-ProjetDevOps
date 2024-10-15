@@ -25,7 +25,7 @@ pipeline {
                 script {
                     // Configuration des propriétés SonarQube
                     def sonarProjectKey = 'mon.projet'  // La clé de votre projet
-                    def sonarProjectName = 'Mon Projet'  // Nom de votre projet
+                    def sonarProjectName = 'mon projet'  // Nom de votre projet
                     def sonarHostUrl = 'http://192.168.33.10:9000'  // URL de votre serveur SonarQube
                     def sonarLogin = 'sqb_4ba87e36c05b50b9f207a969d3ac818eb81b429a'  // Votre token d'authentification
 
