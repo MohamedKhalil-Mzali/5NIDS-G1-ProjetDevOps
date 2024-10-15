@@ -23,13 +23,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Configuration des propriétés SonarQube
-                    def sonarProjectKey = 'mon.projet'  // La clé de votre projet
-                    def sonarProjectName = 'mon projet'  // Nom de votre projet
-                    def sonarHostUrl = 'http://192.168.33.10:9000'  // URL de votre serveur SonarQube
-                    def sonarLogin = 'sqb_4ba87e36c05b50b9f207a969d3ac818eb81b429a'  // Votre token d'authentification
+                    def sonarProjectKey = 'nawel'  
+                    def sonarProjectName = 'nawel'  
+                    def sonarHostUrl = 'http://192.168.33.10:9000'  
+                    def sonarLogin = 'sqb_1fd79ddeea85094b5dd84f59cc0778457903de54'  // Nouveau token
 
-                    // Exécution de l'analyse SonarQube
                     sh "mvn sonar:sonar -Dsonar.projectKey=${sonarProjectKey} " +
                        "-Dsonar.projectName='${sonarProjectName}' " +
                        "-Dsonar.host.url=${sonarHostUrl} " +
