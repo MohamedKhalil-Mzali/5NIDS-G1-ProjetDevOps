@@ -20,19 +20,10 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Scan') {
             steps {
-                script {
-                    def sonarProjectKey = 'nawel'  
-                    def sonarProjectName = 'Nawel'  
-                    def sonarHostUrl = 'http://192.168.33.10:9000'  
-                    def sonarToken = 'sqb_1fd79ddeea85094b5dd84f59cc0778457903de54'  // Nouveau token
-
-                    // Exécuter l'analyse SonarQube
-                    sh "mvn sonar:sonar -Dsonar.projectKey=${sonarProjectKey} " +
-                       "-Dsonar.projectName='${sonarProjectName}' " +
-                       "-Dsonar.host.url=${sonarHostUrl} " +
-                       "-Dsonar.token=${sonarToken}"
+                withSonarQubeEnv(installationName: 'sq1') {
+                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
         }
