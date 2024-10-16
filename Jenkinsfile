@@ -16,14 +16,16 @@ pipeline {
 
         stage('Compile Stage') {
             steps {
-                sh 'mvn clean compile'
+                
+                sh 'mvn -f 5NIDS-G1-ProjetDevOps/pom.xml clean compile'
             }
         }
 
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
+                    
+                    sh 'mvn -f 5NIDS-G1-ProjetDevOps/pom.xml sonar:sonar'
                 }
             }
         }
