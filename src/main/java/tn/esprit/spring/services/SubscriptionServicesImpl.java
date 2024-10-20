@@ -17,10 +17,9 @@ import java.util.Set;
 @Slf4j
 @AllArgsConstructor
 @Service
-public class SubscriptionServicesImpl implements ISubscriptionServices{
+public class SubscriptionServicesImpl implements ISubscriptionServices {
 
     private ISubscriptionRepository subscriptionRepository;
-
     private ISkierRepository skierRepository;
 
     @Override
@@ -60,12 +59,12 @@ public class SubscriptionServicesImpl implements ISubscriptionServices{
     }
 
     @Override
-    @Scheduled(cron = "*/30 * * * * *") /* Cron expression to run a job every 30 secondes */
+    @Scheduled(cron = "*/30 * * * * *") // Cron expression to run a job every 30 seconds
     public void retrieveSubscriptions() {
-        for (Subscription sub: subscriptionRepository.findDistinctOrderByEndDateAsc()) {
-            Skier   aSkier = skierRepository.findBySubscription(sub);
-            log.info(sub.getNumSub().toString() + " | "+ sub.getEndDate().toString()
-                    + " | "+ aSkier.getFirstName() + " " + aSkier.getLastName());
+        for (Subscription sub : subscriptionRepository.findDistinctOrderByEndDateAsc()) {
+            Skier aSkier = skierRepository.findBySubscription(sub);
+            log.info(sub.getNumSubscription().toString() + " | " + sub.getEndDate().toString()
+                    + " | " + aSkier.getFirstName() + " " + aSkier.getLastName());
         }
     }
 
@@ -83,7 +82,4 @@ public class SubscriptionServicesImpl implements ISubscriptionServices{
         Float revenue = monthlyRevenue + semestrielRevenue + annualRevenue;
         log.info("Monthly Revenue = " + revenue);
     }
-
-
 }
-
