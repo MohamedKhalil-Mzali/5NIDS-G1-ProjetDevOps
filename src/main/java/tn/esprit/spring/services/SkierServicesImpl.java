@@ -3,6 +3,7 @@ package tn.esprit.spring.services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.spring.entities.*;
+import tn.esprit.spring.exceptions.EntityNotFoundException;
 import tn.esprit.spring.repositories.*;
 
 import java.util.HashSet;
@@ -34,16 +35,18 @@ public class SkierServicesImpl implements ISkierServices {
     }
 
     private void setSubscriptionEndDate(Skier skier) {
-        switch (skier.getSubscription().getTypeSub()) {
-            case ANNUAL:
-                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusYears(1));
-                break;
-            case SEMESTRIEL:
-                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(6));
-                break;
-            case MONTHLY:
-                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(1));
-                break;
+        if (skier.getSubscription() != null) {
+            switch (skier.getSubscription().getTypeSub()) {
+                case ANNUAL:
+                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusYears(1));
+                    break;
+                case SEMESTRIEL:
+                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(6));
+                    break;
+                case MONTHLY:
+                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(1));
+                    break;
+            }
         }
     }
 
