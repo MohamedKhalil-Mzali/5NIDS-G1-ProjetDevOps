@@ -28,19 +28,23 @@ public class SkierServicesImpl implements ISkierServices {
     @Override
     public Skier addSkier(Skier skier) {
         if (skier.getSubscription() != null) {
-            switch (skier.getSubscription().getTypeSub()) {
-                case ANNUAL:
-                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusYears(1));
-                    break;
-                case SEMESTRIEL:
-                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(6));
-                    break;
-                case MONTHLY:
-                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(1));
-                    break;
-            }
+            setSubscriptionEndDate(skier);
         }
         return skierRepository.save(skier);
+    }
+
+    private void setSubscriptionEndDate(Skier skier) {
+        switch (skier.getSubscription().getTypeSub()) {
+            case ANNUAL:
+                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusYears(1));
+                break;
+            case SEMESTRIEL:
+                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(6));
+                break;
+            case MONTHLY:
+                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(1));
+                break;
+        }
     }
 
     @Override
@@ -53,21 +57,22 @@ public class SkierServicesImpl implements ISkierServices {
             skier.setSubscription(subscriptionOpt.get());
             return skierRepository.save(skier);
         }
-        return null; // Handle case where skier or subscription doesn't exist
+        throw new EntityNotFoundException("Skier or Subscription not found");
     }
 
     @Override
     public Skier addSkierAndAssignToCourse(Skier skier, Long numCourse) {
         Skier savedSkier = skierRepository.save(skier);
-        Course course = courseRepository.findById(numCourse).orElse(null);
+        Course course = courseRepository.findById(numCourse)
+                          .orElseThrow(() -> new EntityNotFoundException("Course not found"));
 
-        if (course != null) {
-            Set<Registration> registrations = savedSkier.getRegistrations();
-            for (Registration r : registrations) {
-                r.setSkier(savedSkier);
-                r.setCourse(course);
-                registrationRepository.save(r);
-            }
+        Set<Registration> registrations = Optional.ofNullable(savedSkier.getRegistrations())
+                                                  .orElse(new HashSet<>());
+
+        for (Registration registration : registrations) {
+            registration.setSkier(savedSkier);
+            registration.setCourse(course);
+            registrationRepository.save(registration);
         }
         return savedSkier;
     }
@@ -79,27 +84,24 @@ public class SkierServicesImpl implements ISkierServices {
 
     @Override
     public Skier retrieveSkier(Long numSkier) {
-        return skierRepository.findById(numSkier).orElse(null);
+        return skierRepository.findById(numSkier)
+                .orElseThrow(() -> new EntityNotFoundException("Skier not found"));
     }
 
     @Override
-    public Skier assignSkierToPiste(Long numSkieur, Long numPiste) {
-        Optional<Skier> skierOpt = skierRepository.findById(numSkieur);
+    public Skier assignSkierToPiste(Long numSkier, Long numPiste) {
+        Optional<Skier> skierOpt = skierRepository.findById(numSkier);
         Optional<Piste> pisteOpt = pisteRepository.findById(numPiste);
 
         if (skierOpt.isPresent() && pisteOpt.isPresent()) {
             Skier skier = skierOpt.get();
             Piste piste = pisteOpt.get();
-            Set<Piste> pistes = skier.getPistes();
-
-            if (pistes == null) {
-                pistes = new HashSet<>();
-                skier.setPistes(pistes);
-            }
+            Set<Piste> pistes = Optional.ofNullable(skier.getPistes()).orElse(new HashSet<>());
             pistes.add(piste);
+            skier.setPistes(pistes);
             return skierRepository.save(skier);
         }
-        return null; // Handle case where skier or piste doesn't exist
+        throw new EntityNotFoundException("Skier or Piste not found");
     }
 
     @Override
@@ -107,4 +109,3 @@ public class SkierServicesImpl implements ISkierServices {
         return skierRepository.findBySubscription_TypeSub(typeSubscription);
     }
 }
-
