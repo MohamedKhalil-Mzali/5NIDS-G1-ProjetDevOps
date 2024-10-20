@@ -16,7 +16,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-        <sonar.sources>gestion-ski</sonar.sources> <!-- Specify source directory for SonarQube -->
+       <!-- <sonar.sources>gestion-ski</sonar.sources>  Specify source directory for SonarQube -->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -55,7 +55,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>gestion-ski</sourceDirectory> <!-- Specify source directory -->
+		<!-- <sourceDirectory>gestion-ski</sourceDirectory> Specify source directory -->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
