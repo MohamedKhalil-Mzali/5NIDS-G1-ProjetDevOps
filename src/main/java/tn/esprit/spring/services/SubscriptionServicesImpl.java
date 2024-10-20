@@ -12,31 +12,34 @@ import tn.esprit.spring.repositories.ISubscriptionRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor
 @Service
-public class SubscriptionServicesImpl implements ISubscriptionServices{
+public class SubscriptionServicesImpl implements ISubscriptionServices {
 
-    private ISubscriptionRepository subscriptionRepository;
-
-    private ISkierRepository skierRepository;
+    private final ISubscriptionRepository subscriptionRepository;
+    private final ISkierRepository skierRepository;
 
     @Override
     public Subscription addSubscription(Subscription subscription) {
+        subscription.setEndDate(calculateEndDate(subscription));
+        return subscriptionRepository.save(subscription);
+    }
+
+    private LocalDate calculateEndDate(Subscription subscription) {
         switch (subscription.getTypeSub()) {
             case ANNUAL:
-                subscription.setEndDate(subscription.getStartDate().plusYears(1));
-                break;
+                return subscription.getStartDate().plusYears(1);
             case SEMESTRIEL:
-                subscription.setEndDate(subscription.getStartDate().plusMonths(6));
-                break;
+                return subscription.getStartDate().plusMonths(6);
             case MONTHLY:
-                subscription.setEndDate(subscription.getStartDate().plusMonths(1));
-                break;
+                return subscription.getStartDate().plusMonths(1);
+            default:
+                throw new IllegalArgumentException("Invalid subscription type");
         }
-        return subscriptionRepository.save(subscription);
     }
 
     @Override
@@ -46,7 +49,8 @@ public class SubscriptionServicesImpl implements ISubscriptionServices{
 
     @Override
     public Subscription retrieveSubscriptionById(Long numSubscription) {
-        return subscriptionRepository.findById(numSubscription).orElse(null);
+        return subscriptionRepository.findById(numSubscription)
+                .orElseThrow(() -> new EntityNotFoundException("Subscription not found"));
     }
 
     @Override
@@ -60,29 +64,24 @@ public class SubscriptionServicesImpl implements ISubscriptionServices{
     }
 
     @Override
-    @Scheduled(cron = "*/30 * * * * *") /* Cron expression to run a job every 30 secondes */
-    public void retrieveSubscriptions() {
-        for (Subscription sub: subscriptionRepository.findDistinctOrderByEndDateAsc()) {
-            Skier   aSkier = skierRepository.findBySubscription(sub);
-            log.info(sub.getNumSub().toString() + " | "+ sub.getEndDate().toString()
-                    + " | "+ aSkier.getFirstName() + " " + aSkier.getLastName());
-        }
+    @Scheduled(cron = "*/30 * * * * *")
+    public void logSubscriptions() {
+        subscriptionRepository.findDistinctOrderByEndDateAsc().forEach(sub -> {
+            Optional<Skier> aSkierOpt = skierRepository.findBySubscription(sub);
+            aSkierOpt.ifPresent(aSkier -> 
+                log.info("{} | {} | {} {}", sub.getNumSub(), sub.getEndDate(), aSkier.getFirstName(), aSkier.getLastName())
+            );
+        });
     }
 
-    @Scheduled(cron = "*/30 * * * * *") // Cron expression to run a job every 30 seconds
+    @Scheduled(cron = "0 0 * * * *") // Adjusted to run hourly for demonstration purposes
     public void showMonthlyRecurringRevenue() {
-        Float monthlyRevenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.MONTHLY);
-        Float semestrielRevenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.SEMESTRIEL);
-        Float annualRevenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.ANNUAL);
+        Float monthlyRevenue = Optional.ofNullable(subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.MONTHLY)).orElse(0f);
+        Float semestrielRevenue = Optional.ofNullable(subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.SEMESTRIEL)).orElse(0f) / 6;
+        Float annualRevenue = Optional.ofNullable(subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.ANNUAL)).orElse(0f) / 12;
 
-        // Use default values of 0 if any revenue is null
-        monthlyRevenue = (monthlyRevenue != null) ? monthlyRevenue : 0;
-        semestrielRevenue = (semestrielRevenue != null) ? semestrielRevenue / 6 : 0;
-        annualRevenue = (annualRevenue != null) ? annualRevenue / 12 : 0;
-
-        Float revenue = monthlyRevenue + semestrielRevenue + annualRevenue;
-        log.info("Monthly Revenue = " + revenue);
+        Float totalRevenue = monthlyRevenue + semestrielRevenue + annualRevenue;
+        log.info("Monthly Revenue = {}", totalRevenue);
     }
-
-
 }
+
