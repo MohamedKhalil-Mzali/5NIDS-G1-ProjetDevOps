@@ -37,7 +37,7 @@ public class InstructorRestController {
 
     @Operation(description = "Update Instructor")
     @PutMapping("/update")
-    public Instructor updateInstructor(@RequestBody Instructor instructor) { // Nom du paramètre modifié
+    public Instructor updateInstructor(@RequestBody Instructor instructor) {
         return instructorServices.updateInstructor(instructor);
     }
 
@@ -46,6 +46,5 @@ public class InstructorRestController {
     public Instructor getById(@PathVariable("id-instructor") Long numInstructor) {
         return instructorServices.retrieveInstructor(numInstructor);
     }
+}
 
-}
-}
