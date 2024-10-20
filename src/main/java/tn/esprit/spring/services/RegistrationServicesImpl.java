@@ -19,9 +19,9 @@ import java.util.List;
 @Service
 public class RegistrationServicesImpl implements IRegistrationServices {
 
-    private IRegistrationRepository registrationRepository;
-    private ISkierRepository skierRepository;
-    private ICourseRepository courseRepository;
+    private final IRegistrationRepository registrationRepository;
+    private final ISkierRepository skierRepository;
+    private final ICourseRepository courseRepository;
 
     @Override
     public Registration addRegistrationAndAssignToSkier(Registration registration, Long numSkier) {
@@ -40,11 +40,12 @@ public class RegistrationServicesImpl implements IRegistrationServices {
 
     @Transactional
     @Override
-    public Registration addRegistrationAndAssignToSkierAndCourse(Registration registration, Long numSkieur, Long numCours) {
-        Skier skier = findSkierById(numSkieur);
-        Course course = findCourseById(numCours);
+    public Registration addRegistrationAndAssignToSkierAndCourse(Registration registration, Long numSkier, Long numCourse) {
+        Skier skier = findSkierById(numSkier);
+        Course course = findCourseById(numCourse);
 
         if (skier == null || course == null) {
+            log.error("Skier or Course not found");
             return null;
         }
 
@@ -55,13 +56,13 @@ public class RegistrationServicesImpl implements IRegistrationServices {
         return processRegistration(registration, skier, course);
     }
 
-    private Skier findSkierById(Long numSkieur) {
-        return skierRepository.findById(numSkieur)
+    private Skier findSkierById(Long numSkier) {
+        return skierRepository.findById(numSkier)
                 .orElseThrow(() -> new EntityNotFoundException("Skier not found"));
     }
 
-    private Course findCourseById(Long numCours) {
-        return courseRepository.findById(numCours)
+    private Course findCourseById(Long numCourse) {
+        return courseRepository.findById(numCourse)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
     }
 
@@ -73,23 +74,23 @@ public class RegistrationServicesImpl implements IRegistrationServices {
     private boolean isAlreadyRegistered(Registration registration, Skier skier, Course course) {
         if (registrationRepository.countDistinctByNumWeekAndSkier_NumSkierAndCourse_NumCourse(
                 registration.getNumWeek(), skier.getNumSkier(), course.getNumCourse()) >= 1) {
-            log.info("Sorry, you're already registered for this course of the week: " + registration.getNumWeek());
+            log.info("Already registered for course of the week: " + registration.getNumWeek());
             return true;
         }
         return false;
     }
 
     private Registration processRegistration(Registration registration, Skier skier, Course course) {
-        int ageSkieur = calculateAge(skier);
-        log.info("Age " + ageSkieur);
+        int ageSkier = calculateAge(skier);
+        log.info("Age: " + ageSkier);
 
         switch (course.getTypeCourse()) {
             case INDIVIDUAL:
                 return assignRegistration(registration, skier, course);
             case COLLECTIVE_CHILDREN:
-                return handleCollectiveChildrenRegistration(registration, skier, course, ageSkieur);
+                return handleCollectiveChildrenRegistration(registration, skier, course, ageSkier);
             default:
-                return handleCollectiveAdultRegistration(registration, skier, course, ageSkieur);
+                return handleCollectiveAdultRegistration(registration, skier, course, ageSkier);
         }
     }
 
@@ -103,32 +104,32 @@ public class RegistrationServicesImpl implements IRegistrationServices {
         return registrationRepository.save(registration);
     }
 
-    private Registration handleCollectiveChildrenRegistration(Registration registration, Skier skier, Course course, int ageSkieur) {
-        if (ageSkieur < 16) {
+    private Registration handleCollectiveChildrenRegistration(Registration registration, Skier skier, Course course, int ageSkier) {
+        if (ageSkier < 16) {
             log.info("Ok CHILD !");
             if (registrationRepository.countByCourseAndNumWeek(course, registration.getNumWeek()) < 6) {
                 log.info("Course successfully added !");
                 return assignRegistration(registration, skier, course);
             } else {
-                log.info("Full Course ! Please choose another week to register !");
+                log.info("Full Course! Please choose another week to register!");
             }
         } else {
-            log.info("Sorry, your age doesn't allow you to register for this course ! Try to register for a Collective Adult Course...");
+            log.info("Age restriction: try registering for a Collective Adult Course...");
         }
         return registration;
     }
 
-    private Registration handleCollectiveAdultRegistration(Registration registration, Skier skier, Course course, int ageSkieur) {
-        if (ageSkieur >= 16) {
+    private Registration handleCollectiveAdultRegistration(Registration registration, Skier skier, Course course, int ageSkier) {
+        if (ageSkier >= 16) {
             log.info("Ok ADULT !");
             if (registrationRepository.countByCourseAndNumWeek(course, registration.getNumWeek()) < 6) {
                 log.info("Course successfully added !");
                 return assignRegistration(registration, skier, course);
             } else {
-                log.info("Full Course ! Please choose another week to register !");
+                log.info("Full Course! Please choose another week to register!");
             }
         } else {
-            log.info("Sorry, your age doesn't allow you to register for this course ! Try to register for a Collective Child Course...");
+            log.info("Age restriction: try registering for a Collective Child Course...");
         }
         return registration;
     }
@@ -138,3 +139,4 @@ public class RegistrationServicesImpl implements IRegistrationServices {
         return registrationRepository.numWeeksCourseOfInstructorBySupport(numInstructor, support);
     }
 }
+
