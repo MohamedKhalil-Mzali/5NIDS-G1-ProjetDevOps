@@ -18,5 +18,9 @@ public class Subscription {
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    private TypeSubscription typeSub; // Ensure TypeSubscription is defined correctly
+    private TypeSubscription typeSub;
+
+    public Long getNumSubscription() {
+        return numSubscription;
+    }
 }
