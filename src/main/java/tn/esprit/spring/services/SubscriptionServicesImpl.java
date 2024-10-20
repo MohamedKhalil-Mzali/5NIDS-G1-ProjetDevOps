@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import tn.esprit.spring.entities.Skier;
 import tn.esprit.spring.entities.Subscription;
 import tn.esprit.spring.entities.TypeSubscription;
+import tn.esprit.spring.exceptions.EntityNotFoundException;
 import tn.esprit.spring.repositories.ISkierRepository;
 import tn.esprit.spring.repositories.ISubscriptionRepository;
 
@@ -44,6 +45,7 @@ public class SubscriptionServicesImpl implements ISubscriptionServices {
 
     @Override
     public Subscription updateSubscription(Subscription subscription) {
+        subscription.setEndDate(calculateEndDate(subscription)); // Ensure end date is updated
         return subscriptionRepository.save(subscription);
     }
 
@@ -74,7 +76,7 @@ public class SubscriptionServicesImpl implements ISubscriptionServices {
         });
     }
 
-    @Scheduled(cron = "0 0 * * * *") // Adjusted to run hourly for demonstration purposes
+    @Scheduled(cron = "0 0 * * * *") // Runs hourly for demonstration
     public void showMonthlyRecurringRevenue() {
         Float monthlyRevenue = Optional.ofNullable(subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.MONTHLY)).orElse(0f);
         Float semestrielRevenue = Optional.ofNullable(subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.SEMESTRIEL)).orElse(0f) / 6;
@@ -84,4 +86,5 @@ public class SubscriptionServicesImpl implements ISubscriptionServices {
         log.info("Monthly Revenue = {}", totalRevenue);
     }
 }
+
 
