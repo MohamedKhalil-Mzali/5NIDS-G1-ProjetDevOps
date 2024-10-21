@@ -14,7 +14,7 @@ services:
   app-spring:
     depends_on:
       - mysqldb  
-    image: khalilmzali/gestion-station-ski
+    image: khalilmzali/gestion-station-ski:1.0.0
     restart: on-failure
     ports:
       - 8082:8082
