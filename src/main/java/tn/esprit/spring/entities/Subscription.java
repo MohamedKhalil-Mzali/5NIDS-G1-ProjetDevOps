@@ -14,13 +14,13 @@ public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long numSubscription;
+
     private LocalDate startDate;
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
     private TypeSubscription typeSub;
 
-    public Long getNumSubscription() {
-        return numSubscription;
-    }
+    private Float price;
+
 }
