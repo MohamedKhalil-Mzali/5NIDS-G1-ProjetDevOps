@@ -18,6 +18,7 @@ public class Skier implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long numSkier;
+
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
@@ -29,9 +30,9 @@ public class Skier implements Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-        name = "excursion",
-        joinColumns = @JoinColumn(name = "numSkier"),
-        inverseJoinColumns = @JoinColumn(name = "numPiste"))
+            name = "excursion",
+            joinColumns = @JoinColumn(name = "numSkier"),
+            inverseJoinColumns = @JoinColumn(name = "numPiste"))
     private Set<Piste> pistes;
 
     @OneToMany(mappedBy = "skier")
