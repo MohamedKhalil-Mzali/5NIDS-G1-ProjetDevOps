@@ -40,7 +40,7 @@ pipeline {
             }
         }
 
-        stage('Docker push') {
+        stage('Deploy image') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-jenkins-token', variable: 'dockerhub_token')]) {
                     sh "docker login -u nawel119 -p ${dockerhub_token}"
@@ -48,5 +48,11 @@ pipeline {
                 }
             }
         }
+         stage('Docker compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
+
     }
 }
