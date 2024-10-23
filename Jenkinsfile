@@ -36,9 +36,17 @@ pipeline {
 
         stage('Building image') {
             steps {
-                sh 'docker build -t nawel119/gestion-station-ski-1.0..0 .'
+                sh 'docker build -t nawel119/gestion-station-ski:1.0.0 .'
             }
         }
-        
+
+        stage('Docker push') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-jenkins-token', variable: 'dockerhub_token')]) {
+                    sh "docker login -u nawel119 -p ${dockerhub_token}"
+                    sh 'docker push nawel119/gestion-station-ski:1.0.0'
+                }
+            }
+        }
     }
 }
