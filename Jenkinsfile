@@ -33,5 +33,12 @@ pipeline {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
+
+        stage('Building image') {
+            steps {
+                sh 'docker build -t nawel119/gestion-station-ski-1.0..0 .'
+            }
+        }
+        
     }
 }
