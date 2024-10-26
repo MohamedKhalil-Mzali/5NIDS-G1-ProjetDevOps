@@ -18,12 +18,22 @@ pipeline {
             steps {
                 sh 'mvn clean compile'
             }
+            post {
+                failure {
+                    echo 'Compilation failed!'
+                }
+            }
         }
 
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
+                }
+            }
+            post {
+                failure {
+                    echo 'SonarQube scan failed!'
                 }
             }
         }
@@ -34,6 +44,14 @@ pipeline {
                     mvn deploy -DskipTests \
                     -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
                 '''
+            }
+            post {
+                success {
+                    echo 'Deployment to Nexus was successful!'
+                }
+                failure {
+                    echo 'Deployment to Nexus failed!'
+                }
             }
         }
     }
