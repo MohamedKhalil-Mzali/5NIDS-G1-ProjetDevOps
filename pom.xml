@@ -58,8 +58,7 @@
 <repository>
 <id>deploymentRepo</id>
 <name>Nexus Repository</name>
-<url>http://localhost:8081/repository/maven-releases/</url>
-</repository>
+<url>http://192.168.56.10:8081/repository/maven-releases/</url></repository>
 </distributionManagement>
     <build>
         <plugins>
