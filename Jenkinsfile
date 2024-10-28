@@ -48,11 +48,35 @@ pipeline {
                 }
             }
         }
-         stage('Docker compose') {
+
+        stage('Docker compose') {
             steps {
                 sh 'docker compose up -d'
             }
         }
+    }
 
+    post {
+        success {
+            script {
+                emailext (
+                    subject: "Build Success: ${currentBuild.fullDisplayName}",
+                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nawel.hammami@esprit.tn'
+                )
+            }
+        }
+        failure {
+            script {
+                emailext (
+                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
+                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nawel.hammami@esprit.tn'
+                )
+            }
+        }
     }
 }
+
