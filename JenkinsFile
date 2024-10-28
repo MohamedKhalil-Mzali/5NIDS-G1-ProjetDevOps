@@ -19,5 +19,13 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+
+        stage('Scan') {
+            steps {
+                withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
     }
 }
