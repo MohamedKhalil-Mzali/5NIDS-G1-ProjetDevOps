@@ -10,7 +10,7 @@ pipeline {
         stage('GIT') {
             steps {
                 // Clone the specified branch of the repository
-                git branch: 'Nawelhammami-5NIDS1-G1', 
+                git branch: 'WAJDIBENROMDHANE-5NIDS1-G1', 
                     url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
