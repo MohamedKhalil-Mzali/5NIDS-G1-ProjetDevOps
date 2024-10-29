@@ -51,13 +51,13 @@ pipeline {
 
         stage('Docker compose') {
             steps {
-                sh 'docker-compose up -d'
+                sh 'docker compose up -d'
             }
         }
 
         stage('Deploy Grafana') {
             steps {
-                sh 'docker-compose up -d grafana'
+                sh 'docker compose up -d grafana'
             }
         }
     }
