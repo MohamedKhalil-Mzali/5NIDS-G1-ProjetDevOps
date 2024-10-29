@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   mysqldb:
     image: mysql:5.7
@@ -28,5 +30,16 @@ services:
     stdin_open: true
     tty: true
 
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=Nawelhammami123++ # Votre mot de passe Grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+
 volumes:
   db:
+  grafana_data:
