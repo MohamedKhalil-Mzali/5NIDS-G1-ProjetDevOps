@@ -13,10 +13,10 @@ services:
   app-spring:
     depends_on:
       - mysqldb
-    image: nawel119/gestion-station-ski:1.0.0
+    image: wajdibenromdhane/gestion-station-ski:1.0.0
     restart: on-failure
     ports:
-      - 8086:8085
+      - 8082:8082
     environment:
       SPRING_APPLICATION_JSON: '{
         "spring.datasource.url": "jdbc:mysql://mysqldb:3306/ski-project3?createDatabaseIfNotExist=true", 
