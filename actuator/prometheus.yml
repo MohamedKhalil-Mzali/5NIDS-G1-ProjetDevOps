@@ -1,9 +1,5 @@
 global:
-  scrape_interval: 15s  # Default scrape every 15 seconds
-
-rule_files:
-  # - "first_rules.yml"  # Uncomment and specify if you have rule files
-  # - "second_rules.yml"
+  scrape_interval: 15s  # Intervalle de scrapping
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -15,7 +11,8 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.33.10:8080']
 
-  - job_name: '5nids-g1-projetdevops-job-pipeline-app-spring-1'
-    metrics_path: '/gestion-station-ski/actuator/prometheus'
+  - job_name: 'app-spring'
+    metrics_path: '/gestion-station-ski/actuator/prometheus'  # Chemin pour les métriques Spring
     static_configs:
-      - targets: ['192.168.33.10:8082']  # Use the service name
+      - targets: ['app-spring:8082']  # Utilisez le nom du service défini dans docker-compose
+
