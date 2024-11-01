@@ -38,6 +38,21 @@ pipeline {
             }
         }
 
+        stage('Security Check') {
+            steps {
+                // Run OWASP Dependency-Check
+                sh 'mvn org.codehaus.mojo:dependency-check-maven:check'
+            }
+            post {
+                failure {
+                    echo 'Dependency-Check failed! Found vulnerabilities in dependencies.'
+                }
+                success {
+                    echo 'No vulnerabilities found in dependencies.'
+                }
+            }
+        }
+
         stage('Deploy to Nexus') {
             steps {
                 sh '''
@@ -56,3 +71,4 @@ pipeline {
         }
     }
 }
+
