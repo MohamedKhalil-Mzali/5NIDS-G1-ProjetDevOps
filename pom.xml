@@ -81,11 +81,11 @@
                 <version>3.9.0.2155</version>
             </plugin>
             <plugin>
-                <groupId>org.owasp.plugins</groupId>
+                <groupId>org.codehaus.mojo</groupId> <!-- Updated group ID -->
                 <artifactId>dependency-check-maven</artifactId>
-                <version>6.2.2</version> <!-- Use the latest stable version -->
+                <version>6.6.0</version> <!-- Updated to the latest version -->
                 <configuration>
-                    <failBuildOnCVSS>7</failBuildOnCVSS> <!-- Fail the build if CVSS score is higher than 7 -->
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
                     <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
                 </configuration>
             </plugin>
