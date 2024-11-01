@@ -1,8 +1,10 @@
-
+# prometheus.yml
 global:
-  scrape_interval: 15s  
-rule_files:
+  scrape_interval: 15s  # Default scrape every 15 seconds
 
+rule_files:
+  # - "first_rules.yml"  # Uncomment and specify if you have rule files
+  # - "second_rules.yml"
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -17,4 +19,4 @@ scrape_configs:
   - job_name: 'app-spring'
     metrics_path: '/gestion-station-ski/actuator/prometheus'
     static_configs:
-      - targets: ['5nids-g1-projetdevops-job-pipeline-app-spring-1:8082']  
+      - targets: ['app-spring:8082']  # Use the service name
