@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s  # Default scrape every 15 seconds
+
+rule_files:
+  # - "first_rules.yml"  # Uncomment and specify if you have rule files
+  # - "second_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'jenkins'
+    metrics_path: /prometheus
+    static_configs:
+      - targets: ['192.168.33.10:8080']
+
+  - job_name: '5nids-g1-projetdevops-job-pipeline-app-spring-1'
+    metrics_path: '/gestion-station-ski/actuator/prometheus'
+    static_configs:
+      - targets: ['192.168.33.10:8082']  # Use the service name
