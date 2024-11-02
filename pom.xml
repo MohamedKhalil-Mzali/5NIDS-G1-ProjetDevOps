@@ -81,9 +81,9 @@
                 <version>3.9.0.2155</version>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId> <!-- Updated group ID -->
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>6.6.0</version> <!-- Updated to the latest version -->
+                <version>6.6.0</version>
                 <configuration>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
@@ -91,6 +91,12 @@
             </plugin>
         </plugins>
     </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </pluginRepository>
+    </pluginRepositories>
     <distributionManagement>
         <repository>
             <id>deploymentRepo</id>
