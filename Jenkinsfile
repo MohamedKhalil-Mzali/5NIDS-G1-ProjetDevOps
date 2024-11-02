@@ -55,11 +55,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Grafana') {
-            steps {
-                sh 'docker compose up -d grafana'
-            }
-        }
+        
     }
 
     post {
