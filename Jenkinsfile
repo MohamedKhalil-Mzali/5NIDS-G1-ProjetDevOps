@@ -33,6 +33,26 @@ pipeline {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
+        stage('Building image') {
+            steps {
+                sh 'docker build -t zarix12/gestion-station-ski:1.0.0 .'
+            }
+        }
+
+        stage('Deploy image') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-jenkins-token', variable: 'dockerhub_token')]) {
+                    sh "docker login -u zarix12 -p ${dockerhub_token}"
+                    sh 'docker push zarix12/gestion-station-ski:1.0.0'
+                }
+            }
+        }
+
+        stage('Docker compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
         
     }
 }
