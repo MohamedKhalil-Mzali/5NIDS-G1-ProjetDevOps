@@ -15,13 +15,13 @@ services:
   app-spring:
     depends_on:
       - mysqldb
-    image: nawel119/gestion-station-ski:1.0.0
+    image: zarix12/gestion-station-ski:1.0.0
     restart: on-failure
     ports:
       - 8082:8082
     environment:
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url": "jdbc:mysql://mysqldb:3306/ski-project3?createDatabaseIfNotExist=true", 
+        "spring.datasource.url": "jdbc:mysql://192.168.33.10:3306/ski-project3?createDatabaseIfNotExist=true", 
         "spring.datasource.username": "root",
         "spring.datasource.password": "root",
         "spring.jpa.hibernate.ddl-auto": "update",
@@ -30,26 +30,6 @@ services:
     stdin_open: true
     tty: true
 
-  prometheus:
-    image: prom/prometheus
-    restart: always
-    ports:
-      - "9090:9090"
-    volumes:
-      - prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
-  grafana:
-    image: grafana/grafana
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=Nawelhammami123++ # Votre mot de passe Grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-
 volumes:
   db:
-  grafana_data:
-  prometheus_data:
+  
