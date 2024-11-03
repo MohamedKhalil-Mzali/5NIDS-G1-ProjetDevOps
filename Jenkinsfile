@@ -65,10 +65,10 @@ pipeline {
         stage('Email Notification') {
             steps {
                 mail bcc: '', 
-                     body: '''Stage: GIT Pull
+                     body: '''Stage: GIT
  - Pulling from Git...
 
-Stage: Maven Clean Compile
+Stage: Compile Stage
  - Building Spring project...
 
 Stage: Scan
@@ -77,16 +77,16 @@ Stage: Scan
 Stage: Deploy to Nexus
  - Deploying to Nexus...
 
-Stage: Build Docker Image
+Stage: Building image
  - Building Docker image for the application...
 
-Stage: Push Docker Image
+Stage: Deploy image
  - Pushing Docker image to Docker Hub...
 
 Stage: Docker Compose
  - Running Docker Compose...
 
-Stage: Monitoring Services
+Stage: Start Monitoring Containers
  - Starting Prometheus and Grafana...
 
 Final Report: The pipeline has completed successfully. No action required.
