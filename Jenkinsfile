@@ -57,8 +57,8 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start be79135ec1cc || echo "Grafana déjà en cours d\'exécution"'
-                sh 'docker start 2595c0624b4e || echo "Prometheus déjà en cours d\'exécution"'
+                sh 'docker start be79135ec1cc'
+               
             }
         }
 
