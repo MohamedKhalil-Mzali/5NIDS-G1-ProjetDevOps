@@ -55,7 +55,49 @@ pipeline {
             }
         }
 
-        
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start be79135ec1cc || echo "Grafana déjà en cours d\'exécution"'
+                sh 'docker start 2595c0624b4e || echo "Prometheus déjà en cours d\'exécution"'
+            }
+        }
+
+        stage('Email Notification') {
+            steps {
+                mail bcc: '', 
+                     body: '''Stage: GIT Pull
+ - Pulling from Git...
+
+Stage: Maven Clean Compile
+ - Building Spring project...
+
+Stage: Scan
+ - Running Sonarqube analysis...
+
+Stage: Deploy to Nexus
+ - Deploying to Nexus...
+
+Stage: Build Docker Image
+ - Building Docker image for the application...
+
+Stage: Push Docker Image
+ - Pushing Docker image to Docker Hub...
+
+Stage: Docker Compose
+ - Running Docker Compose...
+
+Stage: Monitoring Services
+ - Starting Prometheus and Grafana...
+
+Final Report: The pipeline has completed successfully. No action required.
+''', 
+                     cc: '', 
+                     from: '', 
+                     replyTo: '', 
+                     subject: 'Succès de la pipeline DevOps Project', 
+                     to: 'nawel.hammami@esprit.tn'
+            }
+        }
     }
 
     post {
