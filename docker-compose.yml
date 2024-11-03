@@ -39,17 +39,9 @@ services:
       - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
-  grafana:
-    image: grafana/grafana
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=Nawelhammami123++ # Votre mot de passe Grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
+  
 
 volumes:
   db:
-  grafana_data:
+ 
   prometheus_data:
