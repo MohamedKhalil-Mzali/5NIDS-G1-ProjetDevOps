@@ -39,9 +39,6 @@ services:
       - prometheus_data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
-  
-
 volumes:
   db:
- 
   prometheus_data:
