@@ -18,24 +18,21 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-        <java.version>17</java.version> <!-- Version de Java -->
+        <java.version>17</java.version> <!-- Java version -->
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
 
     <dependencies>
-        <!-- Spring Data JPA pour la gestion des entités -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Spring Web pour les APIs REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- MySQL Connector pour la connexion à la base de données MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -43,7 +40,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Spring Boot DevTools pour le rechargement automatique en développement -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -51,35 +47,30 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Lombok pour générer le code automatiquement -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- Springdoc OpenAPI pour la documentation de l'API REST -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.6.12</version>
         </dependency>
 
-        <!-- Micrometer pour exposer les métriques avec Prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Jakarta Persistence API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- Dépendance de test pour les tests unitaires et d'intégration -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -94,15 +85,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>tn.esprit.spring.GestionStationSkiApplication</mainClass>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
                 </configuration>
             </plugin>
-            <!-- Sonar Maven Plugin pour l'analyse de code -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
@@ -119,4 +103,5 @@
         </repository>
     </distributionManagement>
 </project>
+
 
