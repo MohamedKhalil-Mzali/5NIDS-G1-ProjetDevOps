@@ -95,7 +95,7 @@ Final Report: The pipeline has completed successfully. No action required.
                      from: '', 
                      replyTo: '', 
                      subject: 'Succès de la pipeline DevOps Project', 
-                     to: 'nawel.hammami@esprit.tn'
+                     to: 'hammaminawel22@gmail.com'
             }
         }
     }
@@ -107,7 +107,7 @@ Final Report: The pipeline has completed successfully. No action required.
                     subject: "Build Success: ${currentBuild.fullDisplayName}",
                     body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'nawel.hammami@esprit.tn'
+                    to: 'hammaminawel22@gmail.com'
                 )
             }
         }
@@ -117,7 +117,7 @@ Final Report: The pipeline has completed successfully. No action required.
                     subject: "Build Failure: ${currentBuild.fullDisplayName}",
                     body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'nawel.hammami@esprit.tn'
+                    to: 'hammaminawel22@gmail.com'
                 )
             }
         }
