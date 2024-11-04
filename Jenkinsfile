@@ -58,44 +58,20 @@ pipeline {
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start be79135ec1cc'
-               
             }
         }
 
         stage('Email Notification') {
             steps {
                 mail bcc: '', 
-                     body: '''Stage: GIT
- - Pulling from Git...
-
-Stage: Compile Stage
- - Building Spring project...
-
-Stage: Scan
- - Running Sonarqube analysis...
-
-Stage: Deploy to Nexus
- - Deploying to Nexus...
-
-Stage: Building image
- - Building Docker image for the application...
-
-Stage: Deploy image
- - Pushing Docker image to Docker Hub...
-
-Stage: Docker Compose
- - Running Docker Compose...
-
-Stage: Start Monitoring Containers
- - Starting Prometheus and Grafana...
-
+                     body: '''
 Final Report: The pipeline has completed successfully. No action required.
 ''', 
                      cc: '', 
                      from: '', 
                      replyTo: '', 
                      subject: 'Succès de la pipeline DevOps Project', 
-                     to: 'hammaminawel22@gmail.com'
+                     to: 'hammaminawel22@gmail.com, nawel.hammami@esprit.tn' // Added new email address
             }
         }
     }
@@ -107,7 +83,7 @@ Final Report: The pipeline has completed successfully. No action required.
                     subject: "Build Success: ${currentBuild.fullDisplayName}",
                     body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'hammaminawel22@gmail.com'
+                    to: 'hammaminawel22@gmail.com, nawel.hammami@esprit.tn'
                 )
             }
         }
@@ -117,10 +93,11 @@ Final Report: The pipeline has completed successfully. No action required.
                     subject: "Build Failure: ${currentBuild.fullDisplayName}",
                     body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
                     recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'hammaminawel22@gmail.com'
+                    to: 'hammaminawel22@gmail.com, nawel.hammami@esprit.tn'
                 )
             }
         }
     }
 }
+
 
