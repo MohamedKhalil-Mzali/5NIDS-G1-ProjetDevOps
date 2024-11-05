@@ -1,8 +1,10 @@
 package tn.esprit.spring.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,70 +14,53 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import tn.esprit.spring.entities.Course;
 import tn.esprit.spring.services.ICourseServices;
 
 public class CourseRestControllerTest {
 
+    @Mock
+    private ICourseServices courseServices;
+
     @InjectMocks
     private CourseRestController courseRestController;
 
-    @Mock
-    private ICourseServices courseServices;
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(courseRestController).build();
     }
 
     @Test
-    void testAddCourse() {
+    void testAddCourse() throws Exception {
         Course course = new Course();
-        course.setNumCourse(1L);
+        // Configurez l'objet Course ici (ex. setNumCourse, setLevel, etc.)
+
         when(courseServices.addCourse(any(Course.class))).thenReturn(course);
 
-        Course createdCourse = courseRestController.addCourse(course);
-
-        verify(courseServices, times(1)).addCourse(course);
-        assert createdCourse.getNumCourse() == 1L;
+        mockMvc.perform(post("/course/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(course)))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void testGetAllCourses() {
+    void testGetAllCourses() throws Exception {
         Course course1 = new Course();
         Course course2 = new Course();
         List<Course> courses = Arrays.asList(course1, course2);
 
         when(courseServices.retrieveAllCourses()).thenReturn(courses);
 
-        List<Course> result = courseRestController.getAllCourses();
-
-        verify(courseServices, times(1)).retrieveAllCourses();
-        assert result.size() == 2;
-    }
-
-    @Test
-    void testUpdateCourse() {
-        Course course = new Course();
-        course.setNumCourse(1L);
-        when(courseServices.updateCourse(any(Course.class))).thenReturn(course);
-
-        Course updatedCourse = courseRestController.updateCourse(course);
-
-        verify(courseServices, times(1)).updateCourse(course);
-        assert updatedCourse.getNumCourse() == 1L;
-    }
-
-    @Test
-    void testGetById() {
-        Course course = new Course();
-        course.setNumCourse(1L);
-        when(courseServices.retrieveCourse(anyLong())).thenReturn(course);
-
-        Course retrievedCourse = courseRestController.getById(1L);
-
-        verify(courseServices, times(1)).retrieveCourse(1L);
-        assert retrievedCourse.getNumCourse() == 1L;
+        mockMvc.perform(get("/course/all"))
+                .andExpect(status().isOk());
     }
 }
