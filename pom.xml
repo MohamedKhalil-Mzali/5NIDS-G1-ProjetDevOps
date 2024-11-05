@@ -75,9 +75,9 @@
                 <version>3.9.0.2155</version>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>8.2.1</version> <!-- Adjust to a stable version -->
+                <version>5.5.1</version>
                 <configuration>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
