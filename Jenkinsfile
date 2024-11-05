@@ -20,13 +20,13 @@ pipeline {
             }
         }
 
-        stage(' Unit Tests') {
+        stage(' JUnit/Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
 
-        stage('Scan') {
+        stage('Scan : sonarqube') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
