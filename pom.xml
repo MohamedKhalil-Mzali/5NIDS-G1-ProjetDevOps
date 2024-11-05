@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.14</version> <!-- Use the latest version -->
+            <version>1.6.14</version>
         </dependency>
     </dependencies>
     <build>
@@ -75,9 +75,9 @@
                 <version>3.9.0.2155</version>
             </plugin>
             <plugin>
-                <groupId>org.owasp</groupId>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>8.4.0</version>
+                <version>8.2.1</version> <!-- Adjust to a stable version -->
                 <configuration>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
@@ -88,12 +88,6 @@
             </plugin>
         </plugins>
     </build>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
     <distributionManagement>
         <repository>
             <id>deploymentRepo</id>
