@@ -10,7 +10,7 @@ pipeline {
         stage('GIT') {
             steps {
                 git branch: 'MedRayenBalghouthi-5NIDS1-G1', 
-                url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
+                    url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
 
@@ -41,7 +41,7 @@ pipeline {
         stage('Security Check') {
             steps {
                 // Run OWASP Dependency-Check
-                sh 'mvn org.codehaus.mojo:dependency-check-maven:check'
+                sh 'mvn org.owasp:dependency-check-maven:5.5.1:check'
             }
             post {
                 failure {
@@ -71,4 +71,3 @@ pipeline {
         }
     }
 }
-
