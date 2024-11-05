@@ -20,6 +20,12 @@ pipeline {
             }
         }
 
+        stage(' Unit Tests') {
+            steps {
+                sh 'mvn test' 
+            }
+        }
+
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
