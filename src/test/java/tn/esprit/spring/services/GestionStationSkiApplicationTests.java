@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(exclude = {SecurityAutoConfiguration.class})
 @AutoConfigureMockMvc // Permet d'utiliser MockMvc pour tester les requêtes HTTP
 class GestionStationSkiApplicationTests {
 
