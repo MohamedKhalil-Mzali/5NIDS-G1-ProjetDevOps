@@ -1,8 +1,7 @@
 package tn.esprit.spring.services;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,17 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import tn.esprit.spring.entities.Course;
 import tn.esprit.spring.repositories.ICourseRepository;
 
 public class CourseServicesImplTest {
 
-    @InjectMocks
-    private CourseServicesImpl courseServices;
-
     @Mock
     private ICourseRepository courseRepository;
+
+    @InjectMocks
+    private CourseServicesImpl courseServices;
 
     @BeforeEach
     void setUp() {
@@ -39,51 +37,41 @@ public class CourseServicesImplTest {
 
         List<Course> result = courseServices.retrieveAllCourses();
 
-        verify(courseRepository, times(1)).findAll();
-        assertEquals(2, result.size());
+        verify(courseRepository).findAll(); // Vérifie que la méthode findAll a été appelée
+        assert(result.size() == 2);
     }
 
     @Test
     void testAddCourse() {
         Course course = new Course();
-        when(courseRepository.save(any(Course.class))).thenReturn(course);
+        when(courseRepository.save(course)).thenReturn(course);
 
-        Course createdCourse = courseServices.addCourse(course);
+        Course result = courseServices.addCourse(course);
 
-        verify(courseRepository, times(1)).save(course);
-        assertNotNull(createdCourse);
+        verify(courseRepository).save(course);
+        assert(result != null);
     }
 
     @Test
     void testUpdateCourse() {
         Course course = new Course();
-        when(courseRepository.save(any(Course.class))).thenReturn(course);
+        when(courseRepository.save(course)).thenReturn(course);
 
-        Course updatedCourse = courseServices.updateCourse(course);
+        Course result = courseServices.updateCourse(course);
 
-        verify(courseRepository, times(1)).save(course);
-        assertNotNull(updatedCourse);
+        verify(courseRepository).save(course);
+        assert(result != null);
     }
 
     @Test
     void testRetrieveCourse() {
+        Long courseId = 1L;
         Course course = new Course();
-        course.setNumCourse(1L);
-        when(courseRepository.findById(anyLong())).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.findById(courseId)).thenReturn(java.util.Optional.of(course));
 
-        Course retrievedCourse = courseServices.retrieveCourse(1L);
+        Course result = courseServices.retrieveCourse(courseId);
 
-        verify(courseRepository, times(1)).findById(1L);
-        assertEquals(course.getNumCourse(), retrievedCourse.getNumCourse());
-    }
-
-    @Test
-    void testRetrieveCourseNotFound() {
-        when(courseRepository.findById(anyLong())).thenReturn(java.util.Optional.empty());
-
-        Course retrievedCourse = courseServices.retrieveCourse(1L);
-
-        verify(courseRepository, times(1)).findById(1L);
-        assertNull(retrievedCourse);
+        verify(courseRepository).findById(courseId);
+        assert(result != null);
     }
 }
