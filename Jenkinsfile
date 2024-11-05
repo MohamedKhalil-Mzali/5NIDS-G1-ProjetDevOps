@@ -41,7 +41,7 @@ pipeline {
         stage('Security Check') {
             steps {
                 // Run OWASP Dependency-Check
-                sh 'mvn org.owasp:dependency-check-maven:5.5.1:check'
+                sh 'mvn org.owasp:dependency-check-maven:8.2.1:check'
             }
             post {
                 failure {
