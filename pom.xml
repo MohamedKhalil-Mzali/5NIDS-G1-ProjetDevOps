@@ -23,7 +23,6 @@
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.language>java</sonar.language>
     </properties>
-    </properties>
     <dependencies>
 
         <dependency>
@@ -58,11 +57,7 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.1.0</version>
         </dependency>
-
-
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
