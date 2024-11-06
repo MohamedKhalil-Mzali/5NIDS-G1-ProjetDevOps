@@ -66,9 +66,9 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                sh '''
+                sh ''' 
                     mvn deploy -DskipTests \
-                    -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
+                    -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/ 
                 '''
             }
             post {
@@ -122,7 +122,7 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start 6191d4dac2a6 ' // prometheus
+                sh 'docker start 6191d4dac2a6'  
             }
             post {
                 failure {
