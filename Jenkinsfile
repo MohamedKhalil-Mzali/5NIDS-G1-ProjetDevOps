@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
-                git branch: 'MedRayenBalghouthi-5NIDS1-G1', 
+                git branch: 'MedRayenBalghouthi-5NIDS1-G1',
                     url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
@@ -25,7 +25,18 @@ pipeline {
             }
         }
 
-        stage('Scan') {
+        stage('JUnit/Mockito Tests') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                failure {
+                    echo 'Tests failed!'
+                }
+            }
+        }
+
+        stage('Scan: SonarQube') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
@@ -67,6 +78,91 @@ pipeline {
                 failure {
                     echo 'Deployment to Nexus failed!'
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t rayenbal/5nids-g1:1.0.0 .'
+            }
+            post {
+                failure {
+                    echo 'Docker image build failed!'
+                }
+            }
+        }
+
+        stage('Deploy Docker Image') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-jenkins-token', variable: 'dockerhub_token')]) {
+                    sh "docker login -u rayenbal -p ${dockerhub_token}"
+                    sh 'docker push rayenbal/5nids-g1:1.0.0'
+                }
+            }
+            post {
+                success {
+                    echo 'Docker image pushed successfully!'
+                }
+                failure {
+                    echo 'Docker image push failed!'
+                }
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                sh 'docker-compose up -d'
+            }
+            post {
+                failure {
+                    echo 'Docker compose up failed!'
+                }
+            }
+        }
+
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start 6191d4dac2a6 ' // prometheus
+            }
+            post {
+                failure {
+                    echo 'Failed to start monitoring containers!'
+                }
+            }
+        }
+
+        stage('Email Notification') {
+            steps {
+                mail bcc: '',
+                     body: 'Final Report: The pipeline has completed successfully. No action required.',
+                     cc: '',
+                     from: '',
+                     replyTo: '',
+                     subject: 'Success of DevOps Pipeline',
+                     to: 'medrayen.balghouthi@esprit.tn, medrayen.balghouthi@gmail.com'
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                emailext(
+                    subject: "Build Success: ${currentBuild.fullDisplayName}",
+                    body: "The build was successful! Check the details at ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'medrayen.balghouthi@esprit.tn, medrayen.balghouthi@gmail.com'
+                )
+            }
+        }
+        failure {
+            script {
+                emailext(
+                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
+                    body: "The build failed! Check the details at ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'medrayen.balghouthi@esprit.tn, medrayen.balghouthi@gmail.com'
+                )
             }
         }
     }
