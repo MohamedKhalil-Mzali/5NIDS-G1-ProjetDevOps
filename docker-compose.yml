@@ -14,7 +14,7 @@ services:
   app-tpfoyer:
     depends_on:
       - mysqldb
-    image: ghadaimg/tp-foyer:5.0.0
+    image: ghadaimg/tp-foyer:latest
     #build : ./
     restart: on-failure
     ports:
