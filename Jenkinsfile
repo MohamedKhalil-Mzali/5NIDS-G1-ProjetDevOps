@@ -25,7 +25,7 @@ pipeline {
 
         stage('JUnit/Mockito Tests') {
             steps {
-                sh 'mvn test'
+                sh 'mvn test -U'
             }
             post {
                 failure {
