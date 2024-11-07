@@ -90,22 +90,25 @@ pipeline {
             }
         }
 
-        stage('Deploy Docker Image') {
-            steps {
-                withCredentials([string(credentialsId: 'Docker', variable: 'dockerhub_token')]) {
-                    sh "docker login -u rayenbal -p ${dockerhub_token}"
-                    sh 'docker push rayenbal/5nids-g1:1.0.0'
-                }
-            }
-            post {
-                success {
-                    echo 'Docker image pushed successfully!'
-                }
-                failure {
-                    echo 'Docker image push failed!'
-                }
+       stage('Deploy Docker Image') {
+    steps {
+        script {
+            echo "Attempting Docker login with user: rayenbal"
+            withCredentials([string(credentialsId: 'Docker', variable: 'dockerhub_token')]) {
+                sh "docker login -u rayenbal -p ${dockerhub_token}"
+                sh 'docker push rayenbal/5nids-g1:1.0.0'
             }
         }
+    }
+    post {
+        success {
+            echo 'Docker image pushed successfully!'
+        }
+        failure {
+            echo 'Docker image push failed!'
+        }
+    }
+       }
 
         stage('Docker Compose') {
             steps {
