@@ -92,7 +92,7 @@ pipeline {
 
         stage('Deploy Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-jenkins-token', variable: 'dockerhub_token')]) {
+                withCredentials([string(credentialsId: 'Docker', variable: 'dockerhub_token')]) {
                     sh "docker login -u rayenbal -p ${dockerhub_token}"
                     sh 'docker push rayenbal/5nids-g1:1.0.0'
                 }
