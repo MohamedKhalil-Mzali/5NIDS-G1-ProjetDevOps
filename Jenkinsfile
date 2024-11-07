@@ -120,7 +120,7 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start 6191d4dac2a6'
+                sh 'docker start docker-prometheus-1 docker-mysqldb-1 grafana'
             }
             post {
                 failure {
@@ -174,7 +174,7 @@ pipeline {
                         </body>
                         </html>
                     """,
-                    to: 'rayenbal55@gmail.com',
+                    to: 'rayenbal87@gmail.com',
                     mimeType: 'text/html'
                 )
             }
@@ -195,7 +195,7 @@ pipeline {
                         </body>
                         </html>
                     """,
-                    to: 'rayenbal55@gmail.com',
+                    to: 'rayenbal87@gmail.com',
                     mimeType: 'text/html'
                 )
             }
