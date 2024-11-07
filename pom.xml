@@ -1,46 +1,47 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
     <modelVersion>4.0.0</modelVersion>
-
+    
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.5</version> <!-- Upgraded Spring Boot version -->
         <relativePath/>
     </parent>
-
+    
     <groupId>tn.esprit.spring</groupId>
     <artifactId>gestion-station-ski</artifactId>
     <version>1.0</version>
     <name>gestion-station-ski</name>
     <description>Demo project for Spring Boot</description>
-
+    
     <properties>
         <java.version>17</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
-
+    
     <dependencies>
         <!-- Spring Boot Starter Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        
         <!-- Spring Boot Starter Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
+        
         <!-- Spring Boot Starter Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        
         <!-- Lombok (Upgraded version) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -48,22 +49,22 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
-
+        
         <!-- H2 Database (Updated to stable version) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>2.1.214</version> <!-- Updated to a stable version -->
+            <version>2.3.232</version> <!-- Updated to a stable version -->
             <scope>runtime</scope>
         </dependency>
-
+        
         <!-- SpringDoc OpenAPI (Updated version) -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.7.0</version> <!-- Updated version -->
         </dependency>
-
+        
         <!-- Swagger UI (if needed) -->
         <dependency>
             <groupId>org.webjars</groupId>
@@ -71,7 +72,7 @@
             <version>4.19.0</version> <!-- Updated version -->
         </dependency>
     </dependencies>
-
+    
     <repositories>
         <!-- Add Maven Central repository if not already there -->
         <repository>
@@ -79,7 +80,7 @@
             <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
-
+    
     <build>
         <plugins>
             <!-- Spring Boot Maven Plugin -->
@@ -96,14 +97,14 @@
                     </excludes>
                 </configuration>
             </plugin>
-
+            
             <!-- SonarQube Maven Plugin (Updated version) -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.9.1.2184</version> <!-- Upgraded SonarQube plugin -->
             </plugin>
-
+            
             <!-- OWASP Dependency-Check Plugin (Updated version) -->
             <plugin>
                 <groupId>org.owasp</groupId>
@@ -116,7 +117,7 @@
             </plugin>
         </plugins>
     </build>
-
+    
     <distributionManagement>
         <repository>
             <id>deploymentRepo</id>
