@@ -28,7 +28,18 @@ pipeline {
 
         stage('JaCoCo Report') {
             steps {
-                sh 'mvn jacoco:report'
+                sh 'mvn jacoco:report'  // Génére le rapport JaCoCo
+            }
+        }
+
+        stage('JaCoCo coverage report') {
+            steps {
+                step([$class: 'JacocoPublisher',
+                      execPattern: '**/target/jacoco.exec',
+                      classPattern: '**/classes',
+                      sourcePattern: '**/src',
+                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
+                ])  // Publie le rapport JaCoCo dans Jenkins
             }
         }
 
