@@ -94,8 +94,11 @@ pipeline {
     steps {
         script {
             echo "Attempting Docker login with user: rayenbal"
-            withCredentials([string(credentialsId: 'Docker', variable: 'dockerhub_token')]) {
-                sh "docker login -u rayenbal -p ${dockerhub_token}"
+            // Use the correct credentialsId 'Docker'
+            withCredentials([usernamePassword(credentialsId: 'Docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_TOKEN')]) {
+                // Docker login with the username and token
+                sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_TOKEN}"
+                // Push the image to Docker Hub
                 sh 'docker push rayenbal/5nids-g1:1.0.0'
             }
         }
@@ -108,7 +111,8 @@ pipeline {
             echo 'Docker image push failed!'
         }
     }
-       }
+}
+
 
         stage('Docker Compose') {
             steps {
