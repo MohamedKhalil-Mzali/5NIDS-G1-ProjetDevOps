@@ -4,15 +4,18 @@ pipeline {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
     }
+    environment {
+        DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
+        DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'  // Customize this for your setup
+    }
     stages {
-        stage('GIT') {
+        stage('Git Checkout') {
             steps {
-                git branch: 'MedRayenBalghouthi-5NIDS1-G1',
-                    url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
+                git branch: 'MedRayenBalghouthi-5NIDS1-G1', url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
 
-        stage('Compile Stage') {
+        stage('Compile Project') {
             steps {
                 sh 'mvn clean compile'
             }
@@ -23,7 +26,7 @@ pipeline {
             }
         }
 
-        stage('JUnit/Mockito Tests') {
+        stage('Run Unit Tests') {
             steps {
                 sh 'mvn test -U'
             }
@@ -34,7 +37,7 @@ pipeline {
             }
         }
 
-        stage('Scan: SonarQube') {
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
@@ -47,10 +50,13 @@ pipeline {
             }
         }
 
-        stage('Security Check') {
+        stage('Security Vulnerability Scan') {
             steps {
-                // Run OWASP Dependency-Check
-                sh 'mvn org.owasp:dependency-check-maven:8.2.1:check'
+                // Run OWASP Dependency-Check with caching of CVE data
+                sh ''' 
+                    mvn org.owasp:dependency-check-maven:8.2.1:check \
+                    -Ddependency-check.cacheDirectory=${DEPENDENCY_CHECK_CACHE_DIR} 
+                '''
             }
             post {
                 failure {
@@ -62,7 +68,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nexus') {
+        stage('Deploy to Nexus Repository') {
             steps {
                 sh '''
                     mvn deploy -DskipTests \
@@ -90,31 +96,27 @@ pipeline {
             }
         }
 
-       stage('Deploy Docker Image') {
-    steps {
-        script {
-            echo "Attempting Docker login with user: rayenbal"
-            // Use the correct credentialsId 'Docker'
-            withCredentials([usernamePassword(credentialsId: 'Docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_TOKEN')]) {
-                // Docker login with the username and token
-                sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_TOKEN}"
-                // Push the image to Docker Hub
-                sh 'docker push rayenbal/5nids-g1:1.0.0'
+        stage('Push Docker Image to Hub') {
+            steps {
+                script {
+                    echo "Attempting Docker login with user: rayenbal"
+                    withCredentials([usernamePassword(credentialsId: 'Docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_TOKEN')]) {
+                        sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_TOKEN}"
+                        sh 'docker push rayenbal/5nids-g1:1.0.0'
+                    }
+                }
+            }
+            post {
+                success {
+                    echo 'Docker image pushed successfully!'
+                }
+                failure {
+                    echo 'Docker image push failed!'
+                }
             }
         }
-    }
-    post {
-        success {
-            echo 'Docker image pushed successfully!'
-        }
-        failure {
-            echo 'Docker image push failed!'
-        }
-    }
-}
 
-
-        stage('Docker Compose') {
+        stage('Deploy with Docker Compose') {
             steps {
                 sh 'docker-compose up -d'
             }
@@ -136,7 +138,14 @@ pipeline {
             }
         }
 
-        stage('Email Notification') {
+        stage('Generate JaCoCo Coverage Report') {
+            steps {
+                // Generate the JaCoCo coverage report
+                sh 'mvn jacoco:report'
+            }
+        }
+
+        stage('Send Email Notification') {
             steps {
                 script {
                     def subject = currentBuild.currentResult == 'SUCCESS' ? "🎉 Build Success: ${currentBuild.fullDisplayName}" : "⚠️ Build Failure: ${currentBuild.fullDisplayName}"
