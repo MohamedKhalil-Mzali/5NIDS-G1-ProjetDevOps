@@ -55,5 +55,10 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start 40d02048d5f4'
+            }
+        }
     }
 }
