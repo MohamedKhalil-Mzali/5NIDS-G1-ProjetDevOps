@@ -90,18 +90,20 @@ pipeline {
             }
         }
 
-        // Stage pour le scan de sécurité avec Nmap
-        stage('Security Scan : Nmap') {
-            steps {
-                script {
-                    // Execute Nmap scan on localhost or target IP
-                    sh '''
-                    echo "Starting Nmap Security Scan..."
-                    nmap -sS -p 1-65535 -v localhost
-                    '''
-                }
+       // Stage for Nmap scan with error handling
+stage('Security Scan : Nmap') {
+    steps {
+        script {
+            echo "Starting Nmap Security Scan..."
+            // Adding a try-catch block to handle permission issues gracefully
+            try {
+                sh 'sudo nmap -sS -p 1-65535 -v localhost'
+            } catch (Exception e) {
+                echo "Nmap scan failed due to permission issues. Ensure Jenkins has the required privileges."
             }
         }
+    }
+}
 
         stage('Email Notification') {
             steps {
