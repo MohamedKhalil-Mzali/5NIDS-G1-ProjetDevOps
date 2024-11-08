@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/hmrc/security-git-hooks
+    rev: release/1.11.0
+    hooks:
+      # Hook pour vérifier les fichiers staged à la recherche de contenu sensible
+      - id: secrets_filecontent
+        name: Vérification des fichiers staged pour le contenu sensible
+        exclude: >
+          .tar$|.gz$|.jar$|.7z$|.rar$|.bz2$|.zip$|.gzip$|.war$|.ear$|
+          .xlsx$|.xls$|.docx$|.doc$|.pptx$|.pdf$|.jpg$|.png$|.jpeg$|
+          .tif$|.tiff$|.gif$|.bmp$|.webp$|.svg$|.ico$|.psd$|.exe$|
+          .dll$|.dmg$|.de$|.rpm$
+
+      # Hook pour vérifier les fichiers staged à la recherche de types de fichiers sensibles
+      - id: secrets_filename
+        name: Vérification des fichiers staged pour les types de fichiers sensibles
+        exclude: >
+          .tar$|.gz$|.jar$|.7z$|.rar$|.bz2$|.zip$|.gzip$|.war$|.ear$|
+          .xlsx$|.xls$|.docx$|.doc$|.pptx$|.pdf$|.jpg$|.png$|.jpeg$|
+          .tif$|.tiff$|.gif$|.bmp$|.webp$|.svg$|.ico$|.psd$|.exe$|
+          .dll$|.dmg$|.de$|.rpm$
+
+      # Hook pour vérifier la version des hooks locaux par rapport à la dernière version
+      - id: hooks_version_check
+        name: Vérification des hooks locaux contre la dernière version
+        verbose: true
+
