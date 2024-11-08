@@ -1,0 +1,19 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: check-json
+    -   id: check-xml
+-   repo: https://github.com/hmrc/security-git-hooks
+    rev: v1.0.0-beta9
+    hooks:
+    -   id: secrets_filecontent
+        name: Checking staged files for sensitive content
+    -   id: secrets_filename
+        name: Checking staged files for sensitive filetypes
+    -   id: hooks_version_check
+        name: Checking local hooks against latest releases
+        verbose: true
