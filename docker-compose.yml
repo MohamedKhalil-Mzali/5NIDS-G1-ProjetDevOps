@@ -41,7 +41,7 @@ services:
       - "9090:9090"
     volumes:
       - prometheus_data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - /var/lib/jenkins/workspace/5NIDS-G1-ProjetDevOps_pipeline/prometheus.yml:/etc/prometheus/prometheus.yml
 
 volumes:
   db:
