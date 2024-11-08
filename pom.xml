@@ -17,6 +17,8 @@
     <properties>
         <java.version>17</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <!-- Ensure Maven plugin versions are specified to avoid conflicts -->
+        <sonar.host.url>http://192.168.56.10:9000</sonar.host.url> <!-- SonarQube Server URL -->
     </properties>
 
     <dependencies>
@@ -100,6 +102,9 @@
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.9.1.2184</version> <!-- Upgraded SonarQube plugin -->
+                <configuration>
+                    <sonar.host.url>${sonar.host.url}</sonar.host.url> <!-- Reference SonarQube URL from properties -->
+                </configuration>
             </plugin>
 
             <!-- OWASP Dependency-Check Plugin (Updated version) -->
