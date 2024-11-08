@@ -14,31 +14,23 @@ pipeline {
             }
         }
 
-      stage('Pre-commit Security Hooks') {
+     stage('Pre-commit Security Hooks') {
     steps {
         script {
-            // Créer un environnement virtuel pour isoler les dépendances Python
+            // Vérifier si pre-commit est installé, sinon l'installer
             sh '''
             if ! command -v pre-commit &> /dev/null
             then
                 echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
                 python3 -m venv venv
-                source venv/bin/activate
+                . venv/bin/activate  # Utiliser "." au lieu de "source"
                 pip install pre-commit
-            else
-                echo "pre-commit déjà installé"
             fi
             '''
             // Installer les hooks de pre-commit
-            sh '''
-            source venv/bin/activate
-            pre-commit install
-            '''
+            sh '. venv/bin/activate && pre-commit install'
             // Exécuter les hooks de pre-commit pour vérifier tous les fichiers
-            sh '''
-            source venv/bin/activate
-            pre-commit run --all-files
-            '''
+            sh '. venv/bin/activate && pre-commit run --all-files'
         }
     }
 }
