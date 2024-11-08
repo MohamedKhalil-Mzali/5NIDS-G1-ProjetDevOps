@@ -14,25 +14,34 @@ pipeline {
             }
         }
 
-        // Stage pour l'exécution des hooks de sécurité pré-commit
-        stage('Pre-commit Security Hooks') {
-            steps {
-                script {
-                    // Vérifie si pre-commit est installé, sinon l'installe
-                    sh '''
-                    if ! command -v pre-commit &> /dev/null
-                    then
-                        pip install pre-commit
-                    fi
-                    '''
-                    // Installer les hooks de pre-commit
-                    sh 'pre-commit install'
-                    // Exécuter les hooks de pre-commit pour vérifier les fichiers
-                    sh 'pre-commit run --all-files'
-                }
-            }
+      stage('Pre-commit Security Hooks') {
+    steps {
+        script {
+            // Créer un environnement virtuel pour isoler les dépendances Python
+            sh '''
+            if ! command -v pre-commit &> /dev/null
+            then
+                echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install pre-commit
+            else
+                echo "pre-commit déjà installé"
+            fi
+            '''
+            // Installer les hooks de pre-commit
+            sh '''
+            source venv/bin/activate
+            pre-commit install
+            '''
+            // Exécuter les hooks de pre-commit pour vérifier tous les fichiers
+            sh '''
+            source venv/bin/activate
+            pre-commit run --all-files
+            '''
         }
-
+    }
+}
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
