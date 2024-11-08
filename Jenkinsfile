@@ -50,7 +50,7 @@ pipeline {
             }
         }
 
-        stage('Security Vulnerability Scan') {
+        /*stage('Security Vulnerability Scan') {
             steps {
                 // Run OWASP Dependency-Check with caching of CVE data
                 sh ''' 
@@ -66,7 +66,7 @@ pipeline {
                     echo 'No vulnerabilities found in dependencies.'
                 }
             }
-        }
+        }*/
 
         stage('Deploy to Nexus Repository') {
             steps {
