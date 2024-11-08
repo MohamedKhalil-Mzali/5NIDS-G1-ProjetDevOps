@@ -35,7 +35,7 @@ public class CourseServicesImplTest {
     void testRetrieveAllCourses() {
         when(courseRepository.findAll()).thenReturn(Collections.singletonList(course));
 
-        var result = courseServices.retrieveAllCourses();
+        List<Course> result = courseServices.retrieveAllCourses();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
