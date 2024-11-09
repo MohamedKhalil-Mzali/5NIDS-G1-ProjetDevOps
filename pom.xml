@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -116,10 +116,11 @@
                 <configuration>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
-                    <cacheDirectory>${project.build.directory}/dependency-check-cache</cacheDirectory> <!-- Enable caching -->
-                    <disableUpdates>true</disableUpdates> <!-- Disable online updates -->
-                    <threads>4</threads> <!-- Increase parallelism -->
-                    <excludeScopes>test</excludeScopes> <!-- Exclude test dependencies -->
+                    <cacheDirectory>${project.build.directory}/dependency-check-cache</cacheDirectory>
+                    <!-- Disable updates removed for better stability -->
+                    <!-- Parallel threads reduced to 1 -->
+                    <threads>1</threads>
+                    <!-- Exclude test dependencies removed for completeness -->
                 </configuration>
             </plugin>
 
