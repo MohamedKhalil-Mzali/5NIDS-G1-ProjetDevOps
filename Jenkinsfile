@@ -30,13 +30,20 @@ pipeline {
                 }
             }
         }
-         stage('Deploy to Nexus') {
+
+        stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
+
         stage('Building image') {
             steps {
+                // Login to Docker Hub before building the image
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
+                    sh "echo ${dockerhub_token} | docker login -u zarix12 --password-stdin"
+                }
+                // Build the Docker image
                 sh 'docker build -t zarix12/gestion-station-ski:1.0.0 .'
             }
         }
@@ -55,6 +62,7 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
+
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 3d9d88426efa'
@@ -62,3 +70,4 @@ pipeline {
         }
     }
 }
+
