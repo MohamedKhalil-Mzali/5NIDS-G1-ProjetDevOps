@@ -129,7 +129,7 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start docker-prometheus-1 docker-mysqldb-1 grafana'
+                sh 'docker start jenkins-prometheus-1 jenkins-mysqldb-1 grafana'
             }
             post {
                 failure {
