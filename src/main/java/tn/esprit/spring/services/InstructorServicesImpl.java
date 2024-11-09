@@ -1,5 +1,6 @@
 package tn.esprit.spring.services;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tn.esprit.spring.entities.Course;
@@ -40,9 +41,9 @@ public class InstructorServicesImpl implements IInstructorServices{
 
     @Override
     public Instructor addInstructorAndAssignToCourse(Instructor instructor, Long numCourse) {
-        Course course = courseRepository.findById(numCourse).orElse(null);
+        Optional<Course> course = courseRepository.findById(numCourse);
         Set<Course> courseSet = new HashSet<>();
-        courseSet.add(course);
+	course.ifPresent(courseSet::add);
         instructor.setCourses(courseSet);
         return instructorRepository.save(instructor);
     }

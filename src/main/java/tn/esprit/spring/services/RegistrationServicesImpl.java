@@ -7,11 +7,11 @@ import tn.esprit.spring.entities.*;
 import tn.esprit.spring.repositories.ICourseRepository;
 import tn.esprit.spring.repositories.IRegistrationRepository;
 import tn.esprit.spring.repositories.ISkierRepository;
-
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -32,6 +32,7 @@ public class RegistrationServicesImpl implements  IRegistrationServices{
     @Override
     public Registration assignRegistrationToCourse(Long numRegistration, Long numCourse) {
         Registration registration = registrationRepository.findById(numRegistration).orElse(null);
+	if(registration == null) {return null;}
         Course course = courseRepository.findById(numCourse).orElse(null);
         registration.setCourse(course);
         return registrationRepository.save(registration);
@@ -51,6 +52,7 @@ public class RegistrationServicesImpl implements  IRegistrationServices{
             log.info("Sorry, you're already register to this course of the week :" + registration.getNumWeek());
             return null;
         }
+
 
         int ageSkieur = Period.between(skier.getDateOfBirth(), LocalDate.now()).getYears();
         log.info("Age " + ageSkieur);

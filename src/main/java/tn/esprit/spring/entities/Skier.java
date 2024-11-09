@@ -2,39 +2,55 @@ package tn.esprit.spring.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level=AccessLevel.PRIVATE)
 @Entity
 public class Skier implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long numSkier;
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	Long numSkier;
+	String firstName;
+	String lastName;
+	LocalDate dateOfBirth;
+	String city;
 
-    private String firstName;
-    private String lastName;
-    private LocalDate dateOfBirth;
-    private String city;
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	Subscription subscription;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Subscription subscription;
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(
+			name = "excursion",
+			joinColumns = @JoinColumn(name = "numSkier"),
+			inverseJoinColumns = @JoinColumn(name = "numPiste"))
+	private Set<Piste> pistes;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "excursion",
-            joinColumns = @JoinColumn(name = "numSkier"),
-            inverseJoinColumns = @JoinColumn(name = "numPiste"))
-    private Set<Piste> pistes;
 
-    @OneToMany(mappedBy = "skier")
-    private Set<Registration> registrations;
+	@OneToMany(mappedBy = "skier")
+	Set<Registration> registrations;
+
+
+
+
+
+
 }

@@ -2,7 +2,6 @@ package tn.esprit.spring.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.spring.entities.*;
 import tn.esprit.spring.repositories.*;
 
@@ -14,11 +13,16 @@ import java.util.Set;
 @Service
 public class SkierServicesImpl implements ISkierServices {
 
-    private final ISkierRepository skierRepository;
-    private final IPisteRepository pisteRepository;
-    private final ICourseRepository courseRepository;
-    private final IRegistrationRepository registrationRepository;
-    private final ISubscriptionRepository subscriptionRepository;
+    private ISkierRepository skierRepository;
+
+    private IPisteRepository pisteRepository;
+
+    private ICourseRepository courseRepository;
+
+    private IRegistrationRepository registrationRepository;
+
+    private ISubscriptionRepository subscriptionRepository;
+
 
     @Override
     public List<Skier> retrieveAllSkiers() {
@@ -26,38 +30,31 @@ public class SkierServicesImpl implements ISkierServices {
     }
 
     @Override
-    @Transactional
     public Skier addSkier(Skier skier) {
-        if (skier.getSubscription() != null) {
-            switch (skier.getSubscription().getTypeSub()) {
-                case ANNUAL:
-                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusYears(1));
-                    break;
-                case SEMESTRIEL:
-                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(6));
-                    break;
-                case MONTHLY:
-                    skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(1));
-                    break;
-            }
+        switch (skier.getSubscription().getTypeSub()) {
+            case ANNUAL:
+                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusYears(1));
+                break;
+            case SEMESTRIEL:
+                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(6));
+                break;
+            case MONTHLY:
+                skier.getSubscription().setEndDate(skier.getSubscription().getStartDate().plusMonths(1));
+                break;
         }
         return skierRepository.save(skier);
     }
 
     @Override
-    @Transactional
     public Skier assignSkierToSubscription(Long numSkier, Long numSubscription) {
         Skier skier = skierRepository.findById(numSkier).orElse(null);
+	if(skier == null) {return null;}
         Subscription subscription = subscriptionRepository.findById(numSubscription).orElse(null);
-        if (skier != null && subscription != null) {
-            skier.setSubscription(subscription);
-            return skierRepository.save(skier);
-        }
-        return null;
+        skier.setSubscription(subscription);
+        return skierRepository.save(skier);
     }
 
     @Override
-    @Transactional
     public Skier addSkierAndAssignToCourse(Skier skier, Long numCourse) {
         Skier savedSkier = skierRepository.save(skier);
         Course course = courseRepository.getById(numCourse);
@@ -71,7 +68,6 @@ public class SkierServicesImpl implements ISkierServices {
     }
 
     @Override
-    @Transactional
     public void removeSkier(Long numSkier) {
         skierRepository.deleteById(numSkier);
     }
@@ -82,15 +78,20 @@ public class SkierServicesImpl implements ISkierServices {
     }
 
     @Override
-    @Transactional
     public Skier assignSkierToPiste(Long numSkieur, Long numPiste) {
         Skier skier = skierRepository.findById(numSkieur).orElse(null);
+	if(skier == null){ return null;}
         Piste piste = pisteRepository.findById(numPiste).orElse(null);
-        if (skier != null && piste != null) {
+	
+        try {
             skier.getPistes().add(piste);
-            return skierRepository.save(skier);
+        } catch (NullPointerException exception) {
+            Set<Piste> pisteList = new HashSet<>();
+            pisteList.add(piste);
+            skier.setPistes(pisteList);
         }
-        return null;
+
+        return skierRepository.save(skier);
     }
 
     @Override

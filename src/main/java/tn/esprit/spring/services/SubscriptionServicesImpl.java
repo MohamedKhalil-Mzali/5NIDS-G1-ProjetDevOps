@@ -17,9 +17,10 @@ import java.util.Set;
 @Slf4j
 @AllArgsConstructor
 @Service
-public class SubscriptionServicesImpl implements ISubscriptionServices {
+public class SubscriptionServicesImpl implements ISubscriptionServices{
 
     private ISubscriptionRepository subscriptionRepository;
+
     private ISkierRepository skierRepository;
 
     @Override
@@ -59,27 +60,21 @@ public class SubscriptionServicesImpl implements ISubscriptionServices {
     }
 
     @Override
-    @Scheduled(cron = "*/30 * * * * *") // Cron expression to run a job every 30 seconds
+    @Scheduled(cron = "*/30 * * * * *") /* Cron expression to run a job every 30 secondes */
     public void retrieveSubscriptions() {
-        for (Subscription sub : subscriptionRepository.findDistinctOrderByEndDateAsc()) {
-            Skier aSkier = skierRepository.findBySubscription(sub);
-            log.info(sub.getNumSubscription().toString() + " | " + sub.getEndDate().toString()
-                    + " | " + aSkier.getFirstName() + " " + aSkier.getLastName());
+        for (Subscription sub: subscriptionRepository.findDistinctOrderByEndDateAsc()) {
+            Skier   aSkier = skierRepository.findBySubscription(sub);
+            log.info(sub.getNumSub().toString() + " | "+ sub.getEndDate().toString()
+                    + " | "+ aSkier.getFirstName() + " " + aSkier.getLastName());
         }
     }
 
-    @Scheduled(cron = "*/30 * * * * *") // Cron expression to run a job every 30 seconds
+   // @Scheduled(cron = "* 0 9 1 * *") /* Cron expression to run a job every month at 9am */
+    @Scheduled(cron = "*/30 * * * * *") /* Cron expression to run a job every 30 secondes */
     public void showMonthlyRecurringRevenue() {
-        Float monthlyRevenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.MONTHLY);
-        Float semestrielRevenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.SEMESTRIEL);
-        Float annualRevenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.ANNUAL);
-
-        // Use default values of 0 if any revenue is null
-        monthlyRevenue = (monthlyRevenue != null) ? monthlyRevenue : 0;
-        semestrielRevenue = (semestrielRevenue != null) ? semestrielRevenue / 6 : 0;
-        annualRevenue = (annualRevenue != null) ? annualRevenue / 12 : 0;
-
-        Float revenue = monthlyRevenue + semestrielRevenue + annualRevenue;
+        Float revenue = subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.MONTHLY)
+                + subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.SEMESTRIEL)/6
+                + subscriptionRepository.recurringRevenueByTypeSubEquals(TypeSubscription.ANNUAL)/12;
         log.info("Monthly Revenue = " + revenue);
     }
 }
