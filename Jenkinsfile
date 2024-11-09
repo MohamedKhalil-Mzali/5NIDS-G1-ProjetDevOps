@@ -43,7 +43,7 @@ pipeline {
 
         stage('Deploy image') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub.jenkins.token', variable: 'dockerhub_token')]) {
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
                     sh "docker login -u zarix12 -p ${dockerhub_token}"
                     sh 'docker push zarix12/gestion-station-ski:1.0.0'
                 }
