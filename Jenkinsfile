@@ -37,6 +37,14 @@ pipeline {
             }
         }
 
+        // Move JaCoCo Coverage Report here after Unit Tests
+        stage('Generate JaCoCo Coverage Report') {
+            steps {
+                // Generate the JaCoCo coverage report
+                sh 'mvn jacoco:report'
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -50,12 +58,12 @@ pipeline {
             }
         }
 
-        /*stage('Security Vulnerability Scan') {
+        stage('Security Vulnerability Scan') {
             steps {
                 // Run OWASP Dependency-Check with caching of CVE data
                 sh ''' 
                     mvn org.owasp:dependency-check-maven:8.2.1:check \
-                    -Ddependency-check.cacheDirectory=${DEPENDENCY_CHECK_CACHE_DIR} 
+                    -Ddependency-check.cacheDirectory=${DEPENDENCY_CHECK_CACHE_DIR}
                 '''
             }
             post {
@@ -66,11 +74,11 @@ pipeline {
                     echo 'No vulnerabilities found in dependencies.'
                 }
             }
-        }*/
+        }
 
         stage('Deploy to Nexus Repository') {
             steps {
-                sh '''
+                sh ''' 
                     mvn deploy -DskipTests \
                     -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
                 '''
@@ -138,18 +146,11 @@ pipeline {
             }
         }
 
-        stage('Generate JaCoCo Coverage Report') {
-            steps {
-                // Generate the JaCoCo coverage report
-                sh 'mvn jacoco:report'
-            }
-        }
-
         stage('Send Email Notification') {
             steps {
                 script {
                     def subject = currentBuild.currentResult == 'SUCCESS' ? "🎉 Build Success: ${currentBuild.fullDisplayName}" : "⚠️ Build Failure: ${currentBuild.fullDisplayName}"
-                    def body = """
+                    def body = """ 
                         <html>
                         <body>
                             <h2>${currentBuild.currentResult == 'SUCCESS' ? 'Build Successful!' : 'Build Failed!'}</h2>
@@ -179,7 +180,7 @@ pipeline {
             script {
                 emailext(
                     subject: "🎉 Build Success: ${currentBuild.fullDisplayName}",
-                    body: """
+                    body: """ 
                         <html>
                         <body>
                             <h2>Build was successful!</h2>
@@ -199,7 +200,7 @@ pipeline {
             script {
                 emailext(
                     subject: "⚠️ Build Failure: ${currentBuild.fullDisplayName}",
-                    body: """
+                    body: """ 
                         <html>
                         <body>
                             <h2>Unfortunately, the build failed!</h2>
