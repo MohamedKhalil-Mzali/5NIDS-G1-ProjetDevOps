@@ -90,16 +90,15 @@ pipeline {
         }
 
         stage('Publish OWASP Dependency-Check Report') {
-            steps {
-                step([$class: 'DependencyCheckPublisher',
-                      healthy: '0',             // No threshold for failing the build
-                      unhealthy: '1',           // Set to 1 for showing warnings
-                      threshold: '1',           // Set thresholds if needed
-                      defaultEncoding: 'UTF-8', // Set the encoding if required
-                      pattern: '**/dependency-check-report.html' // Pattern to find the report
-                ])
-            }
-        }
+    steps {
+        step([$class: 'DependencyCheckPublisher',
+              pattern: '**/dependency-check-report.html',  // Correct pattern to find the report
+              healthy: '0',           // No threshold for failing the build
+              unhealthy: '1',         // Set to 1 for warnings
+              failureThreshold: '1'   // Set failure threshold if needed
+        ])
+    }
+}
 
         stage('Deploy to Nexus Repository') {
             steps {
