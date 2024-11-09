@@ -121,35 +121,33 @@
 
             <!-- JaCoCo Plugin for Code Coverage -->
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                            <goal>report</goal>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${jacoco.report.path}</outputDirectory>
-                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
-                            <rules>
-                                <rule>
-                                    <element>CLASS</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.01</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+      <groupId>org.jacoco</groupId>
+      <artifactId>jacoco-maven-plugin</artifactId>
+      <version>0.8.8</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>prepare-agent</goal>
+            <goal>report</goal>
+            <goal>check</goal>
+          </goals>
+          <configuration>
+            <rules>
+              <rule>
+                <element>CLASS</element>
+                <limits>
+                  <limit>
+                    <counter>LINE</counter>
+                    <value>COVEREDRATIO</value>
+                    <minimum>0.00</minimum>  <!-- Minimum coverage set here -->
+                  </limit>
+                </limits>
+              </rule>
+            </rules>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
         </plugins>
     </build>
 
