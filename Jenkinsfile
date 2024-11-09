@@ -1,13 +1,16 @@
 pipeline {
     agent any
+
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
     }
+
     environment {
         DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
         DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'
     }
+
     stages {
         stage('Git Checkout') {
             steps {
@@ -43,6 +46,17 @@ pipeline {
             }
         }
 
+        stage('JaCoCo Coverage Report') {
+            steps {
+                step([$class: 'JacocoPublisher',
+                      execPattern: '**/target/jacoco.exec',
+                      classPattern: '**/classes',
+                      sourcePattern: '**/src',
+                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
+                ])  
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -57,21 +71,35 @@ pipeline {
         }
 
         stage('Security Vulnerability Scan') {
-            steps {
-                sh ''' 
-                    mvn org.owasp:dependency-check-maven:8.2.1:check \
-                    -Ddependency-check.cacheDirectory=${DEPENDENCY_CHECK_CACHE_DIR}
-                '''
-            }
-            post {
-                failure {
-                    echo 'Dependency-Check failed! Found vulnerabilities in dependencies.'
-                }
-                success {
-                    echo 'No vulnerabilities found in dependencies.'
-                }
-            }
+    steps {
+        sh ''' 
+            mvn verify -Ddependency-check.skip=false \
+            -Ddependency-check.failBuildOnCVSS=7 \
+            -Ddependency-check.threads=1 \
+            -Ddependency-check.disableUpdates=true \
+            dependency-check:aggregate  # Ensure report is generated
+        '''
+    }
+    post {
+        failure {
+            echo 'Dependency-Check failed! Found vulnerabilities in dependencies.'
         }
+        success {
+            echo 'No vulnerabilities found in dependencies.'
+        }
+    }
+}
+
+        stage('Publish OWASP Dependency-Check Report') {
+    steps {
+        step([$class: 'DependencyCheckPublisher',
+              pattern: '**/dependency-check-report.html',  // Correct pattern to find the report
+              healthy: '0',           // No threshold for failing the build
+              unhealthy: '1',         // Set to 1 for warnings
+              failureThreshold: '1'   // Set failure threshold if needed
+        ])
+    }
+}
 
         stage('Deploy to Nexus Repository') {
             steps {
@@ -123,7 +151,7 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker compose up -d'
+                sh 'docker compose -f docker-compose.yml up -d'
             }
             post {
                 failure {
@@ -163,7 +191,7 @@ pipeline {
                     emailext subject: subject,
                             body: body,
                             mimeType: 'text/html',
-                            to: 'rayenbalghouthi58@gmail.com'
+                            to: 'rayenbal55@gmail.com'
                 }
             }
         }
