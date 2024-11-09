@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
-        DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'  // Customize this for your setup
+        DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'
     }
     stages {
         stage('Git Checkout') {
@@ -37,10 +37,8 @@ pipeline {
             }
         }
 
-        // Move JaCoCo Coverage Report here after Unit Tests
         stage('Generate JaCoCo Coverage Report') {
             steps {
-                // Generate the JaCoCo coverage report
                 sh 'mvn jacoco:report'
             }
         }
@@ -60,7 +58,6 @@ pipeline {
 
         stage('Security Vulnerability Scan') {
             steps {
-                // Run OWASP Dependency-Check with caching of CVE data
                 sh ''' 
                     mvn org.owasp:dependency-check-maven:8.2.1:check \
                     -Ddependency-check.cacheDirectory=${DEPENDENCY_CHECK_CACHE_DIR}
@@ -163,58 +160,11 @@ pipeline {
                         </body>
                         </html>
                     """
-                    emailext(
-                        subject: subject,
-                        body: body,
-                        to: 'rayenbal55@gmail.com',
-                        mimeType: 'text/html',
-                        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']]
-                    )
+                    emailext subject: subject,
+                            body: body,
+                            mimeType: 'text/html',
+                            to: 'rayenbalghouthi58@gmail.com'
                 }
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                emailext(
-                    subject: "🎉 Build Success: ${currentBuild.fullDisplayName}",
-                    body: """ 
-                        <html>
-                        <body>
-                            <h2>Build was successful!</h2>
-                            <p><strong>Build Number:</strong> ${currentBuild.number}</p>
-                            <p><strong>Project:</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Details:</strong> <a href="${env.BUILD_URL}">Click here</a></p>
-                            <p>Thank you for using Jenkins!</p>
-                        </body>
-                        </html>
-                    """,
-                    to: 'rayenbal87@gmail.com',
-                    mimeType: 'text/html'
-                )
-            }
-        }
-        failure {
-            script {
-                emailext(
-                    subject: "⚠️ Build Failure: ${currentBuild.fullDisplayName}",
-                    body: """ 
-                        <html>
-                        <body>
-                            <h2>Unfortunately, the build failed!</h2>
-                            <p><strong>Build Number:</strong> ${currentBuild.number}</p>
-                            <p><strong>Project:</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Details:</strong> <a href="${env.BUILD_URL}">Click here</a></p>
-                            <p style="color:red;">Please check the logs for more details.</p>
-                            <p>Regards,<br/>Jenkins Team</p>
-                        </body>
-                        </html>
-                    """,
-                    to: 'rayenbal87@gmail.com',
-                    mimeType: 'text/html'
-                )
             }
         }
     }
