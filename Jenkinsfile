@@ -71,23 +71,24 @@ pipeline {
         }
 
         stage('Security Vulnerability Scan') {
-            steps {
-                sh ''' 
-                    mvn verify -Ddependency-check.skip=false \
-                    -Ddependency-check.failBuildOnCVSS=7 \
-                    -Ddependency-check.threads=1 \
-                    -Ddependency-check.disableUpdates=true
-                '''
-            }
-            post {
-                failure {
-                    echo 'Dependency-Check failed! Found vulnerabilities in dependencies.'
-                }
-                success {
-                    echo 'No vulnerabilities found in dependencies.'
-                }
-            }
+    steps {
+        sh ''' 
+            mvn verify -Ddependency-check.skip=false \
+            -Ddependency-check.failBuildOnCVSS=7 \
+            -Ddependency-check.threads=1 \
+            -Ddependency-check.disableUpdates=true \
+            dependency-check:aggregate  # Ensure report is generated
+        '''
+    }
+    post {
+        failure {
+            echo 'Dependency-Check failed! Found vulnerabilities in dependencies.'
         }
+        success {
+            echo 'No vulnerabilities found in dependencies.'
+        }
+    }
+}
 
         stage('Publish OWASP Dependency-Check Report') {
     steps {
