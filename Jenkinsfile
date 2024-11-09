@@ -172,28 +172,61 @@ pipeline {
         }
 
         stage('Send Email Notification') {
-            steps {
-                script {
-                    def subject = currentBuild.currentResult == 'SUCCESS' ? "🎉 Build Success: ${currentBuild.fullDisplayName}" : "⚠️ Build Failure: ${currentBuild.fullDisplayName}"
-                    def body = """ 
-                        <html>
-                        <body>
-                            <h2>${currentBuild.currentResult == 'SUCCESS' ? 'Build Successful!' : 'Build Failed!'}</h2>
-                            <p><strong>Build Number:</strong> ${currentBuild.number}</p>
-                            <p><strong>Project:</strong> ${env.JOB_NAME}</p>
-                            <p><strong>Build URL:</strong> <a href="${env.BUILD_URL}">Click here</a></p>
-                            <p><strong>Result:</strong> ${currentBuild.currentResult}</p>
-                            ${currentBuild.currentResult == 'SUCCESS' ? '<p style="color:green;">Everything went great! 🎉</p>' : '<p style="color:red;">There were some issues during the build.</p>'}
-                            <p>Regards,<br/>Your DevOps Jenkins</p>
-                        </body>
-                        </html>
-                    """
-                    emailext subject: subject,
-                            body: body,
-                            mimeType: 'text/html',
-                            to: 'rayenbal55@gmail.com'
-                }
-            }
+    steps {
+        script {
+            def subject = currentBuild.currentResult == 'SUCCESS' ? 
+                "🎉 Build Success: ${currentBuild.fullDisplayName}" : 
+                "⚠️ Build Failure: ${currentBuild.fullDisplayName}"
+
+            def body = """
+                <html>
+                <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;">
+                    <div style="max-width: 600px; margin: auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);">
+                        <h2 style="color: #4CAF50; text-align: center;">Build Status Notification</h2>
+                        <p style="font-size: 16px; line-height: 1.6;">Hello Team,</p>
+                        <p style="font-size: 16px; line-height: 1.6;">The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed.</p>
+
+                        <table style="width: 100%; margin-top: 20px; border-collapse: collapse; border: 1px solid #ddd;">
+                            <tr>
+                                <th style="background-color: #f2f2f2; padding: 8px; text-align: left;">Build Number</th>
+                                <td style="padding: 8px;">${currentBuild.number}</td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f2f2f2; padding: 8px; text-align: left;">Project</th>
+                                <td style="padding: 8px;">${env.JOB_NAME}</td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f2f2f2; padding: 8px; text-align: left;">Build URL</th>
+                                <td style="padding: 8px;"><a href="${env.BUILD_URL}" style="color: #1a73e8;">Click here to view the build</a></td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f2f2f2; padding: 8px; text-align: left;">Result</th>
+                                <td style="padding: 8px; font-weight: bold; color: ${currentBuild.currentResult == 'SUCCESS' ? '#4CAF50' : '#FF7043'};">${currentBuild.currentResult}</td>
+                            </tr>
+                        </table>
+
+                        <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                            ${currentBuild.currentResult == 'SUCCESS' ? 
+                                '<span style="color: #4CAF50;">🎉 The build has successfully passed!</span>' : 
+                                '<span style="color: #FF7043;">❌ There were issues during the build. Please check the logs for details.</span>'}
+                        </p>
+
+                        <p style="font-size: 14px; line-height: 1.6; color: #888;">
+                            Regards,<br/>
+                            The Jenkins DevOps Team, ADMIN : RAYEN
+                        </p>
+                    </div>
+                </body>
+                </html>
+            """
+
+            emailext subject: subject,
+                     body: body,
+                     mimeType: 'text/html',
+                     to: 'rayenbal55@gmail.com'
         }
+    }
+}
+
     }
 }
