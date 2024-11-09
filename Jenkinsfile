@@ -1,13 +1,16 @@
 pipeline {
     agent any
+
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
     }
+
     environment {
         DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
         DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'
     }
+
     stages {
         stage('Git Checkout') {
             steps {
@@ -123,7 +126,7 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker compose up -d'
+                sh 'docker-compose -f docker-compose.yml up -d'
             }
             post {
                 failure {
@@ -163,7 +166,7 @@ pipeline {
                     emailext subject: subject,
                             body: body,
                             mimeType: 'text/html',
-                            to: 'rayenbalghouthi58@gmail.com'
+                            to: 'rayenbal55@gmail.com'
                 }
             }
         }
