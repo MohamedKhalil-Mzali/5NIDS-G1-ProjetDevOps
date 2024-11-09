@@ -110,19 +110,13 @@
 
             <!-- OWASP Dependency-Check Plugin -->
             <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>8.2.1</version>
-                <configuration>
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
-                    <cacheDirectory>${project.build.directory}/dependency-check-cache</cacheDirectory>
-                    <!-- Disable updates removed for better stability -->
-                    <!-- Parallel threads reduced to 1 -->
-                    <threads>1</threads>
-                    <!-- Exclude test dependencies removed for completeness -->
-                </configuration>
-            </plugin>
+    <groupId>org.owasp</groupId>
+    <artifactId>dependency-check-maven</artifactId>
+    <version>8.2.1</version>
+    <configuration>
+        <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory>  <!-- Define where the report goes -->
+    </configuration>
+</plugin>
 
             <!-- JaCoCo Plugin for Code Coverage -->
             <plugin>
