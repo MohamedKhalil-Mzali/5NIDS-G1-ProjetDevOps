@@ -14,6 +14,30 @@ pipeline {
             }
         }
 
+         stage('Pre-commit Security Hooks') {
+    steps {
+        script {
+            // Vérifier si pre-commit est installé, sinon l'installer
+            sh '''
+            if ! command -v pre-commit &> /dev/null
+            then
+                echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install pre-commit
+            fi
+            # Désactiver les hooks Git existants pour éviter les conflits
+            git config --unset-all core.hooksPath
+            # Installer les hooks de pre-commit
+            pre-commit install
+            # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
+            pre-commit run --all-files
+            '''
+        }
+    }
+}
+
+
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
@@ -83,7 +107,14 @@ pipeline {
                 sh 'docker start be79135ec1cc'
             }
         }
-
+  stage('Security Scan : Nmap') {
+    steps {
+        script {
+            echo "Starting Nmap Security Scan..."
+            sh 'sudo nmap -sS -p 1-65535 -v localhost'
+        }
+    }
+}
         stage('Email Notification') {
             steps {
                 mail bcc: '', 
