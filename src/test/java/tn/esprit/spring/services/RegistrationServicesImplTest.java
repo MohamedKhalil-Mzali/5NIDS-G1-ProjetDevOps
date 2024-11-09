@@ -129,13 +129,11 @@ class RegistrationServicesImplTest {
         // Arrange
         when(skierRepository.findById(1L)).thenReturn(Optional.of(skier));
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-        when(registrationRepository.countDistinctByNumWeekAndSkier_NumSkierAndCourse_NumCourse(5, 1L, 1L)).thenReturn(0);
+        when(registrationRepository.countDistinctByNumWeekAndSkier_NumSkierAndCourse_NumCourse(5, 1L, 1L)).thenReturn(0L); // Fixed: returning a Long
         when(registrationRepository.save(any(Registration.class))).thenReturn(registration);
-       
 
-	skier.setDateOfBirth(LocalDate.of(1990, 1, 1));
-	course.setTypeCourse(TypeCourse.INDIVIDUAL);
-
+        skier.setDateOfBirth(LocalDate.of(1990, 1, 1));
+        course.setTypeCourse(TypeCourse.INDIVIDUAL);
 
         // Act
         Registration savedRegistration = registrationServices.addRegistrationAndAssignToSkierAndCourse(registration, 1L, 1L);
@@ -148,8 +146,8 @@ class RegistrationServicesImplTest {
         verify(courseRepository, times(1)).findById(1L);
         verify(registrationRepository, times(1)).save(registration);
 
-	skier.setDateOfBirth(null);
-	course.setTypeCourse(null);
+        skier.setDateOfBirth(null);
+        course.setTypeCourse(null);
     }
 
     @Test
@@ -157,7 +155,7 @@ class RegistrationServicesImplTest {
         // Arrange
         when(skierRepository.findById(1L)).thenReturn(Optional.of(skier));
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-        when(registrationRepository.countDistinctByNumWeekAndSkier_NumSkierAndCourse_NumCourse(5, 1L, 1L)).thenReturn(1);
+        when(registrationRepository.countDistinctByNumWeekAndSkier_NumSkierAndCourse_NumCourse(5, 1L, 1L)).thenReturn(1L); // Fixed: returning a Long
 
         // Act
         Registration savedRegistration = registrationServices.addRegistrationAndAssignToSkierAndCourse(registration, 1L, 1L);
