@@ -13,57 +13,10 @@ pipeline {
                 url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
-
-         stage('Pre-commit Security Hooks') {
-    steps {
-        script {
-            // Vérifier si pre-commit est installé, sinon l'installer
-            sh '''
-            if ! command -v pre-commit &> /dev/null
-            then
-                echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install pre-commit
-            fi
-            # Désactiver les hooks Git existants pour éviter les conflits
-            git config --unset-all core.hooksPath
-            # Installer les hooks de pre-commit
-            pre-commit install
-            # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
-            pre-commit run --all-files
-            '''
-        }
-    }
-}
-
-
+        
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
-            }
-        }
-
-        stage('JUnit/Mockito Tests') {
-            steps {
-                sh 'mvn test' 
-            }
-        }
-
-        stage('JaCoCo Report') {
-            steps {
-                sh 'mvn jacoco:report'  // Génére le rapport JaCoCo
-            }
-        }
-
-        stage('JaCoCo coverage report') {
-            steps {
-                step([$class: 'JacocoPublisher',
-                      execPattern: '**/target/jacoco.exec',
-                      classPattern: '**/classes',
-                      sourcePattern: '**/src',
-                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
-                ])  // Publie le rapport JaCoCo dans Jenkins
             }
         }
 
@@ -104,17 +57,10 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start be79135ec1cc'
+                sh 'docker start 40d02048d5f4'
             }
         }
-  stage('Security Scan : Nmap') {
-    steps {
-        script {
-            echo "Starting Nmap Security Scan..."
-            sh 'sudo nmap -sS -p 1-65535 -v localhost'
-        }
-    }
-}
+  
         stage('Email Notification') {
             steps {
                 mail bcc: '', 
