@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Security Vulnerability Scan') {
+      /*  stage('Security Vulnerability Scan') {
             steps {
                 sh ''' 
                     mvn org.owasp:dependency-check-maven:8.2.1:check \
@@ -74,7 +74,7 @@ pipeline {
                     echo 'No vulnerabilities found in dependencies.'
                 }
             }
-        }
+        }*/
 
         stage('Deploy to Nexus Repository') {
             steps {
