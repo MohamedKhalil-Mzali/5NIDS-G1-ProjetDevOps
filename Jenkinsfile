@@ -60,51 +60,5 @@ pipeline {
                 sh 'docker start 40d02048d5f4'
             }
         }
-         stage('Email Notification') {
-            steps {
-                mail bcc: '', 
-                     body: '''
-Final Report: The pipeline has completed successfully. No action required.
-''', 
-                     cc: '', 
-                     from: '', 
-                     replyTo: '', 
-                     subject: 'Succès de la pipeline DevOps Project', 
-                     to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                emailext (
-                    subject: "Build Success: ${currentBuild.fullDisplayName}",
-                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-                )
-            }
-        }
-        failure {
-            script {
-                emailext (
-                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
-                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-                )
-            }
-        }
-        always {
-            script {
-                emailext (
-                    subject: "Build Notification: ${currentBuild.fullDisplayName}",
-                    body: "Consultez les détails du build à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-                )
-            }
-        }
     }
 }
