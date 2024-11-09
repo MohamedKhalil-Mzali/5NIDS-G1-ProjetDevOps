@@ -70,7 +70,7 @@ stage('JaCoCo coverage report') {
             }
         }
 
-      /*  stage('Security Vulnerability Scan') {
+        stage('Security Vulnerability Scan') {
             steps {
                 sh ''' 
                     mvn org.owasp:dependency-check-maven:8.2.1:check \
@@ -85,7 +85,21 @@ stage('JaCoCo coverage report') {
                     echo 'No vulnerabilities found in dependencies.'
                 }
             }
-        }*/
+        }
+stage('Publish OWASP Dependency-Check Report') {
+            steps {
+                step([$class: 'DependencyCheckPublisher',
+                      healthy: '0',             // No threshold for failing the build
+                      unhealthy: '1',           // Set to 1 for showing warnings
+                      threshold: '1',           // Set thresholds if needed
+                      defaultEncoding: 'UTF-8', // Set the encoding if required
+                      pattern: '**/dependency-check-report.html' // Pattern to find the report
+                ])
+            }
+        }
+    }
+}
+
 
         stage('Deploy to Nexus Repository') {
             steps {
