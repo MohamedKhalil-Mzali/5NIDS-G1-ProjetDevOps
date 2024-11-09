@@ -97,8 +97,8 @@ stage('Publish OWASP Dependency-Check Report') {
                 ])
             }
         }
-    }
-}
+    
+
 
 
         stage('Deploy to Nexus Repository') {
