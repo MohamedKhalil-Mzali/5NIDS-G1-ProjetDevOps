@@ -45,7 +45,8 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-stage('JaCoCo coverage report') {
+
+        stage('JaCoCo Coverage Report') {
             steps {
                 step([$class: 'JacocoPublisher',
                       execPattern: '**/target/jacoco.exec',
@@ -54,8 +55,7 @@ stage('JaCoCo coverage report') {
                       exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
                 ])  
             }
-}
-
+        }
 
         stage('SonarQube Analysis') {
             steps {
@@ -73,8 +73,7 @@ stage('JaCoCo coverage report') {
         stage('Security Vulnerability Scan') {
             steps {
                 sh ''' 
-                    mvn org.owasp:dependency-check-maven:8.2.1:check \
-                    -Ddependency-check.cacheDirectory=${DEPENDENCY_CHECK_CACHE_DIR}
+                    mvn verify
                 '''
             }
             post {
@@ -86,7 +85,8 @@ stage('JaCoCo coverage report') {
                 }
             }
         }
-stage('Publish OWASP Dependency-Check Report') {
+
+        stage('Publish OWASP Dependency-Check Report') {
             steps {
                 step([$class: 'DependencyCheckPublisher',
                       healthy: '0',             // No threshold for failing the build
@@ -97,9 +97,6 @@ stage('Publish OWASP Dependency-Check Report') {
                 ])
             }
         }
-    
-
-
 
         stage('Deploy to Nexus Repository') {
             steps {
