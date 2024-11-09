@@ -9,19 +9,22 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
+                // Clone the specified branch of the repository
                 git branch: 'WAJDIBENROMDHANE-5NIDS1-G1', 
-                url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
+                    url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
-        
+
         stage('Compile Stage') {
             steps {
+                // Clean and compile the project
                 sh 'mvn clean compile'
             }
         }
 
-        stage('Scan : SonarQube') {
+        stage('Scan') {
             steps {
+                // Run SonarQube analysis
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
@@ -36,13 +39,18 @@ pipeline {
 
         stage('Building image') {
             steps {
+                // Login to Docker Hub before building the image
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
+                    sh "echo ${dockerhub_token} | docker login -u wajdibenromdhane --password-stdin"
+                }
+                // Build the Docker image
                 sh 'docker build -t wajdibenromdhane/gestion-station-ski:1.0.0 .'
             }
         }
 
         stage('Deploy image') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-jenkins-token', variable: 'dockerhub_token')]) {
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
                     sh "docker login -u wajdibenromdhane -p ${dockerhub_token}"
                     sh 'docker push wajdibenromdhane/gestion-station-ski:1.0.0'
                 }
@@ -58,53 +66,6 @@ pipeline {
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 40d02048d5f4'
-            }
-        }
-  
-        stage('Email Notification') {
-            steps {
-                mail bcc: '', 
-                     body: '''
-Final Report: The pipeline has completed successfully. No action required.
-''', 
-                     cc: '', 
-                     from: '', 
-                     replyTo: '', 
-                     subject: 'Succès de la pipeline DevOps Project', 
-                     to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                emailext (
-                    subject: "Build Success: ${currentBuild.fullDisplayName}",
-                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-                )
-            }
-        }
-        failure {
-            script {
-                emailext (
-                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
-                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-                )
-            }
-        }
-        always {
-            script {
-                emailext (
-                    subject: "Build Notification: ${currentBuild.fullDisplayName}",
-                    body: "Consultez les détails du build à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
-                )
             }
         }
     }
