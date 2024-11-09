@@ -73,7 +73,10 @@ pipeline {
         stage('Security Vulnerability Scan') {
             steps {
                 sh ''' 
-                    mvn verify
+                    mvn verify -Ddependency-check.skip=false \
+                    -Ddependency-check.failBuildOnCVSS=7 \
+                    -Ddependency-check.threads=1 \
+                    -Ddependency-check.disableUpdates=true
                 '''
             }
             post {
