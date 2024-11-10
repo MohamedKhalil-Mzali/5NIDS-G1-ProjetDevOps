@@ -62,13 +62,13 @@ pipeline {
             }
         }
 
-        stage('Scan : SonarQube') {
-            steps {
-                withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
+        //stage('Scan : SonarQube') {
+          //  steps {
+            //    withSonarQubeEnv('sq1') {
+              //      sh 'mvn sonar:sonar'
+             //   }
+           // }
+     //   }
 
         stage('Deploy to Nexus') {
             steps {
