@@ -1,30 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>tn.esprit</groupId>
   <artifactId>devsec-project</artifactId>
   <version>1.0-SNAPSHOT</version>
-  
+
+  <!-- Add SonarSource repository -->
   <repositories>
-    <!-- Add SonarSource repository -->
     <repository>
       <id>sonarsource</id>
       <url>https://repo.sonarsource.org/content/repositories/releases/</url>
     </repository>
   </repositories>
-  
+
+  <properties>
+    <!-- SonarQube properties -->
+    <sonar.host.url>http://localhost:9000</sonar.host.url> <!-- Change this to your SonarQube server URL -->
+    <sonar.login>your_sonar_token_here</sonar.login> <!-- Add your generated SonarQube token -->
+    <!-- Alternatively, you can use username/password authentication instead of a token -->
+    <!-- <sonar.login>your_username</sonar.login> -->
+    <!-- <sonar.password>your_password</sonar.password> -->
+  </properties>
+
   <dependencies>
-    <!-- Sonar Scanner API Dependency -->
     <dependency>
       <groupId>org.sonarsource.scanner.api</groupId>
       <artifactId>sonar-scanner-api</artifactId>
       <version>2.16.3.1081</version>
     </dependency>
-    
-    <!-- Sonar Scanner API Batch Dependency -->
+
     <dependency>
       <groupId>org.sonarsource.scanner.api</groupId>
       <artifactId>sonar-scanner-api-batch</artifactId>
@@ -32,7 +39,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- JUnit for tests -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -40,7 +46,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Mockito for mocking in tests -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -48,7 +53,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- AssertJ for fluent assertions in tests -->
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
@@ -56,7 +60,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Other testing dependencies -->
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>mockwebserver</artifactId>
@@ -79,7 +82,6 @@
 
   <build>
     <plugins>
-      <!-- Maven Dependency Plugin for copying the batch artifact -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -106,7 +108,6 @@
         </executions>
       </plugin>
 
-      <!-- Maven Shade Plugin to create an uber-jar with reduced dependencies -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -137,33 +138,7 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Sonar Maven Plugin for analysis -->
-      <plugin>
-        <groupId>org.sonarsource.scanner.maven</groupId>
-        <artifactId>sonar-maven-plugin</artifactId>
-        <version>4.0.0.4121</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sonar</goal>
-            </goals>
-            <configuration>
-              <!-- Set the path for compiled classes -->
-              <sonar.java.binaries>${project.build.outputDirectory}</sonar.java.binaries>
-              <!-- Exclude files if needed -->
-              <sonar.exclusions>**/*.test.*,**/*.mock.*</sonar.exclusions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
-  <!-- Add SonarQube properties -->
-  <properties>
-    <!-- Configure SonarQube server if needed -->
-    <sonar.host.url>http://localhost:9000</sonar.host.url>
-    <sonar.login>YourSonarQubeAuthToken</sonar.login>
-  </properties>
 </project>
