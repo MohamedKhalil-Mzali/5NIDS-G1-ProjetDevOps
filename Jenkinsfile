@@ -14,6 +14,24 @@ pipeline {
                     url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    sh '''
+                    if ! command -v pre-commit &> /dev/null
+                    then
+                        echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pre-commit
+                    fi
+                    git config --unset-all core.hooksPath
+                    pre-commit install
+                    pre-commit run --all-files
+                    '''
+                }
+            }
+        }
 
         stage('Compile Stage') {
             steps {
