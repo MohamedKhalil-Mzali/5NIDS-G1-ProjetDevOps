@@ -32,7 +32,7 @@ pipeline {
                 }
             }
         }
-
+/*
         stage('Compile Stage') {
             steps {
                 // Clean and compile the project
@@ -65,7 +65,7 @@ pipeline {
                 sh 'docker build -t wajdibenromdhane/gestion-station-ski:1.0.0 .'
             }
         }
-
+*/
       stage('Security Scan with Trivy') {
             steps {
                 script {
@@ -75,7 +75,7 @@ pipeline {
                 }
             }
         }
-
+/*
         stage('Deploy image') {
             steps {
                 // Push Docker image to Docker Hub
@@ -99,7 +99,7 @@ pipeline {
                 sh 'docker start 40d02048d5f4'
             }
         }
-       
+       */
        stage('Security Scan : Nmap') {
     steps {
         script {
