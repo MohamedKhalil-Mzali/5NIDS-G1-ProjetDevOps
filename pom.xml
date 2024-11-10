@@ -155,4 +155,15 @@
                   <version>2.16.3.1081</version>
                   <type>jar</type>
                   <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                  <destFileName>sonar-scanner-
+                  <destFileName>sonar-scanner-api-batch.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
