@@ -40,7 +40,22 @@ pipeline {
                 }
             }
         }
+        stage('Generate JaCoCo Coverage Report') {
+            steps {
+                sh 'mvn jacoco:report'
+            }
+        }
 
+        stage('JaCoCo Coverage Report') {
+            steps {
+                step([$class: 'JacocoPublisher',
+                      execPattern: '**/target/jacoco.exec',
+                      classPattern: '**/classes',
+                      sourcePattern: '**/src',
+                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
+                ])  
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
