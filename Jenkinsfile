@@ -232,18 +232,20 @@ stage('Make Script Executable') {
 }
 
         stage('Continuous Scanning and Monitoring') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    // Using Falco for continuous runtime security monitoring
-                    sh 'sudo falco --config /etc/falco/falco.yaml'
-                }
-            }
-            post {
-                failure {
-                    echo 'Falco monitoring encountered an error!'
-                }
-            }
+    steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            // Run Falco in a privileged container with necessary mounts
+            sh '''
+            docker run --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock falcosecurity/falco:latest --config /etc/falco/falco.yaml
+            '''
         }
+    }
+    post {
+        failure {
+            echo 'Falco monitoring encountered an error!'
+        }
+    }
+}
 
         stage('Send Email Notification') {
             steps {
