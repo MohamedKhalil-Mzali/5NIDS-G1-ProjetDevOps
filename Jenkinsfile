@@ -103,20 +103,19 @@ pipeline {
             }
         }
 
-        stage('Security Scan: ZAP Baseline Scan') {
+        stage('Security Smoke Tests: ZAP Baseline Scan') {
             steps {
                 script {
-                    def targetUrl = 'http://192.168.33.10:8089'
-                    echo "Starting ZAP Baseline Scan on ${targetUrl}"
-                    sh """
-                        docker run --rm -v \$(pwd):/zap/wrk:rw owasp/zap2docker-stable zap-baseline.py \
-                        -t ${targetUrl} \
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-jenkins-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    }
+                    sh '''
+                        docker run --rm -v $(pwd):/zap/wrk:rw owasp/zap2docker-stable:2.11.1 zap-baseline.py \
+                        -t http://192.168.33.10:8089 \
                         -r ZAP_Report.html \
                         -J ZAP_Report.json \
                         -z "-config api.disablekey=true"
-                    """
-                    archiveArtifacts artifacts: 'ZAP_Report.html', allowEmptyArchive: true
-                    archiveArtifacts artifacts: 'ZAP_Report.json', allowEmptyArchive: true
+                    '''
                 }
             }
         }
