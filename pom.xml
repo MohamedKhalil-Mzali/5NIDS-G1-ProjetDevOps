@@ -149,7 +149,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.00</minimum>  <!-- Minimum coverage set here -->
+                                            <minimum>0.40</minimum>  <!-- Minimum coverage set here -->
                                         </limit>
                                     </limits>
                                 </rule>
