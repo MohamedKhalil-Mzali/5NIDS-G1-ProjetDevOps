@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+        // Development Phase: Pre-commit Security Hooks
         stage('GIT') {
             steps {
                 git branch: 'Nawelhammami-5NIDS1-G1', 
@@ -33,6 +34,7 @@ pipeline {
             }
         }
 
+        // Commit Phase: JUnit/Mockito Security Unit Tests
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
@@ -62,14 +64,34 @@ pipeline {
             }
         }
 
-        //stage('Scan : SonarQube') {
-          //  steps {
-            //    withSonarQubeEnv('sq1') {
-              //      sh 'mvn sonar:sonar'
-             //   }
-           // }
-     //   }
+        // Acceptance Phase: Security Scanning Tools
+        stage('Scan : SonarQube') {
+            steps {
+                withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
 
+        stage('Security Scan: Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'sudo nmap -sS -p 1-65535 -v localhost'
+                }
+            }
+        }
+
+        stage('Security Scan: OWASP Dependency-Check') {
+            steps {
+                script {
+                    echo "Starting OWASP Dependency-Check..."
+                    sh 'mvn org.owasp:dependency-check-maven:check'
+                }
+            }
+        }
+
+        // Production Phase: Deployment and Monitoring
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
@@ -97,27 +119,10 @@ pipeline {
             }
         }
 
+        // Operations Phase: Container and Pipeline Monitoring
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start be79135ec1cc'
-            }
-        }
-
-        stage('Security Scan: OWASP Dependency-Check') {
-            steps {
-                script {
-                    echo "Starting OWASP Dependency-Check..."
-                    sh 'mvn org.owasp:dependency-check-maven:check'
-                }
-            }
-        }
-
-        stage('Security Scan: Nmap') {
-            steps {
-                script {
-                    echo "Starting Nmap Security Scan..."
-                    sh 'sudo nmap -sS -p 1-65535 -v localhost'
-                }
             }
         }
 
