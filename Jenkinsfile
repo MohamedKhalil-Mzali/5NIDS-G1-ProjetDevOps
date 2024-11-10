@@ -153,6 +153,11 @@ pipeline {
                 }
             }
         }
+stage('Make Script Executable') {
+    steps {
+        sh 'chmod +x ./run_security_smoke_tests.sh'
+    }
+}
 
         // Extra security and monitoring stages - catch errors to pass
         stage('Security Smoke Tests') {
