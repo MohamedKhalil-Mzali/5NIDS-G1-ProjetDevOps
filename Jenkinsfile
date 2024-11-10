@@ -69,5 +69,52 @@ pipeline {
             }
         }
     }
+stage('Email Notification') {
+            steps {
+                mail bcc: '', 
+                     body: '''
+Final Report: The pipeline has completed successfully. No action required.
+''', 
+                     cc: '', 
+                     from: '', 
+                     replyTo: '', 
+                     subject: 'Succès de la pipeline DevOps Project', 
+                     to: 'zarouxi@gmail.com, achref.werchfeni@esprit.tn'
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                emailext (
+                    subject: "Build Success: ${currentBuild.fullDisplayName}",
+                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'zarouxi@gmail.com, achref.werchfeni@esprit.tn'
+                )
+            }
+        }
+        failure {
+            script {
+                emailext (
+                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
+                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'zarouxi@gmail.com, achref.werchfeni@esprit.tn'
+                )
+            }
+        }
+        always {
+            script {
+                emailext (
+                    subject: "Build Notification: ${currentBuild.fullDisplayName}",
+                    body: "Consultez les détails du build à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'zarouxi@gmail.com, achref.werchfeni@esprit.tn'
+                )
+            }
+        }
+    }
 }
 
