@@ -20,6 +20,8 @@
         <java.version>17</java.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <jacoco.version>0.8.8</jacoco.version>
+        <!-- Define sonar.java.binaries property -->
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
 
     <dependencies>
@@ -111,8 +113,6 @@
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.9.0.2155</version>
             </plugin>
-
-            
         </plugins>
     </build>
 
@@ -124,3 +124,4 @@
         </repository>
     </distributionManagement>
 </project>
+
