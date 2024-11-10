@@ -107,10 +107,11 @@
         </executions>
       </plugin>
 
-      <!-- Maven Shade Plugin (if needed) -->
+      <!-- Maven Shade Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version> <!-- Added version for the shade plugin -->
         <executions>
           <execution>
             <phase>package</phase>
