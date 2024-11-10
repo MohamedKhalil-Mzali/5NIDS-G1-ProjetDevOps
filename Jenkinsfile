@@ -156,18 +156,15 @@ pipeline {
 
         // Extra security and monitoring stages - catch errors to pass
         stage('Security Smoke Tests') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    // Running a simple smoke test for security validation
-                    sh './run_security_smoke_tests.sh'
-                }
-            }
-            post {
-                failure {
-                    echo 'Security smoke tests failed!'
-                }
-            }
+    steps {
+        sh './run_security_smoke_tests.sh'
+    }
+    post {
+        failure {
+            echo 'Security smoke tests failed!'
         }
+    }
+}
 
         stage('Secrets Management Validation') {
             steps {
