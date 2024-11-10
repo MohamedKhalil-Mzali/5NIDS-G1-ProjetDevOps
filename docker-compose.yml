@@ -28,7 +28,6 @@ services:
         "spring.datasource.username": "root",
         "spring.datasource.password": null,
         "spring.jpa.hibernate.ddl-auto": "update",
-        "spring.jpa.properties.hibernate.dialect": "org.hibernate.dialect.MySQL8Dialect",
         "management.endpoint.prometheus.enabled": "true",
         "management.endpoints.web.exposure.include": "prometheus"
       }'
