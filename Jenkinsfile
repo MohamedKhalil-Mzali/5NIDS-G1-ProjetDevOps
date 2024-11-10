@@ -216,21 +216,21 @@ stage('Make Script Executable') {
         }
 
         stage('Fault Injection') {
-            steps {
-                script {
-                    // Use the container that is running and related to your app
-                    def containerName = 'jenkins-app-spring-1' // Use this container name for fault injection
+    steps {
+        script {
+            // Use the container that is running and related to your app
+            def containerName = 'jenkins-app-spring-1' // You can change this to another container name if needed
 
-                    // Using Pumba for fault injection testing
-                    sh "sudo pumba pause --duration 10s ${containerName}"
-                }
-            }
-            post {
-                failure {
-                    echo 'Fault injection test failed!'
-                }
-            }
+            // Using Pumba for fault injection testing
+            sh "sudo pumba pause --duration 10s ${containerName}"
         }
+    }
+    post {
+        failure {
+            echo 'Fault injection test failed!'
+        }
+    }
+}
 
         stage('Continuous Scanning and Monitoring') {
             steps {
