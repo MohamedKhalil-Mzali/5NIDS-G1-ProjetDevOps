@@ -66,6 +66,16 @@ pipeline {
             }
         }
 
+      stage('Security Scan with Trivy') {
+            steps {
+                script {
+                    // Effectuer un scan avec Trivy pour vérifier la présence de vulnérabilités dans l'image Docker
+                    echo "Lancement du scan de sécurité avec Trivy..."
+                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL wajdibenromdhane/gestion-station-ski:1.0.0'
+                }
+            }
+        }
+
         stage('Deploy image') {
             steps {
                 // Push Docker image to Docker Hub
