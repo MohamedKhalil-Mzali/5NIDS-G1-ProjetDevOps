@@ -14,29 +14,24 @@ pipeline {
             }
         }
 
-         stage('Pre-commit Security Hooks') {
-    steps {
-        script {
-            // Vérifier si pre-commit est installé, sinon l'installer
-            sh '''
-            if ! command -v pre-commit &> /dev/null
-            then
-                echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install pre-commit
-            fi
-            # Désactiver les hooks Git existants pour éviter les conflits
-            git config --unset-all core.hooksPath
-            # Installer les hooks de pre-commit
-            pre-commit install
-            # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
-            pre-commit run --all-files
-            '''
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    sh '''
+                    if ! command -v pre-commit &> /dev/null
+                    then
+                        echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pre-commit
+                    fi
+                    git config --unset-all core.hooksPath
+                    pre-commit install
+                    pre-commit run --all-files
+                    '''
+                }
+            }
         }
-    }
-}
-
 
         stage('Compile Stage') {
             steps {
@@ -52,7 +47,7 @@ pipeline {
 
         stage('JaCoCo Report') {
             steps {
-                sh 'mvn jacoco:report'  // Génére le rapport JaCoCo
+                sh 'mvn jacoco:report'
             }
         }
 
@@ -63,7 +58,7 @@ pipeline {
                       classPattern: '**/classes',
                       sourcePattern: '**/src',
                       exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
-                ])  // Publie le rapport JaCoCo dans Jenkins
+                ])
             }
         }
 
@@ -107,14 +102,34 @@ pipeline {
                 sh 'docker start be79135ec1cc'
             }
         }
-  stage('Security Scan : Nmap') {
-    steps {
-        script {
-            echo "Starting Nmap Security Scan..."
-            sh 'sudo nmap -sS -p 1-65535 -v localhost'
+
+        stage('Security Scan: ZAP Baseline Scan') {
+            steps {
+                script {
+                    def targetUrl = 'http://192.168.33.10:8089'
+                    echo "Starting ZAP Baseline Scan on ${targetUrl}"
+                    sh """
+                        docker run --rm -v \$(pwd):/zap/wrk:rw owasp/zap2docker-stable zap-baseline.py \
+                        -t ${targetUrl} \
+                        -r ZAP_Report.html \
+                        -J ZAP_Report.json \
+                        -z "-config api.disablekey=true"
+                    """
+                    archiveArtifacts artifacts: 'ZAP_Report.html', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'ZAP_Report.json', allowEmptyArchive: true
+                }
+            }
         }
-    }
-}
+
+        stage('Security Scan: Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'sudo nmap -sS -p 1-65535 -v localhost'
+                }
+            }
+        }
+
         stage('Email Notification') {
             steps {
                 mail bcc: '', 
