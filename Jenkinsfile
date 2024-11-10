@@ -9,6 +9,7 @@ pipeline {
     environment {
         DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
         DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'
+        MY_SECRET_KEY = 'dummy_value_for_testing'
     }
 
     stages {
