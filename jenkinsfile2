@@ -6,80 +6,113 @@ pipeline {
         maven 'M2_HOME'
     }
 
+    environment {
+        // Add environment variables if needed for security
+        TRIVY_CACHE_DIR = '/root/.cache/trivy'
+    }
+
     stages {
-        stage('GIT') {
+        // Development Phase
+        stage('Git Checkout') {
             steps {
-                // Clone the specified branch of the repository
                 git branch: 'AchrefWerchfeni-5NIDS1-G1', 
                     url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
 
-        stage('Compile Stage') {
+        stage('Static Code Analysis - SonarQube') {
             steps {
-                // Clean and compile the project
-                sh 'mvn clean compile'
-            }
-        }
-
-        stage('Scan') {
-            steps {
-                // Run SonarQube analysis
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
             }
         }
 
-        stage('Deploy to Nexus') {
+        stage('Security Vulnerability Scan - Dependency Check') {
             steps {
-                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+                // Run OWASP Dependency Check to identify vulnerable dependencies
+                sh 'mvn org.owasp:dependency-check-maven:check'
             }
         }
 
-        stage('Building image') {
+        stage('Security Unit Tests') {
             steps {
-                // Login to Docker Hub before building the image
+                // Run unit tests with security checks
+                sh 'mvn test -Dsecurity'
+            }
+        }
+
+        // Acceptance Phase
+        stage('Compile Project') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Container Security Scan - Trivy') {
+            steps {
+                // Run Trivy to scan the Docker image for vulnerabilities
+                sh 'trivy image --severity HIGH,CRITICAL zarix12/gestion-station-ski:1.0.0'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
                 withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
                     sh "echo ${dockerhub_token} | docker login -u zarix12 --password-stdin"
                 }
-                // Build the Docker image
                 sh 'docker build -t zarix12/gestion-station-ski:1.0.0 .'
             }
         }
 
-        stage('Deploy image') {
+        stage('Push Docker Image to Hub') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
-                    sh "docker login -u zarix12 -p ${dockerhub_token}"
                     sh 'docker push zarix12/gestion-station-ski:1.0.0'
                 }
             }
         }
 
-        stage('Docker compose') {
+        // Production Phase
+        stage('Deploy to Nexus Repository') {
             steps {
-                sh 'docker compose up -d'
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
 
-        stage('Start Monitoring Containers') {
+        stage('Security Smoke Tests') {
             steps {
-                sh 'docker start 3d9d88426efa'
+                // Run security smoke tests after deployment
+                sh 'mvn verify -DskipTests=false -DsmokeTests'
             }
         }
-    }
-stage('Email Notification') {
+
+        stage('Secrets Management Validation') {
             steps {
-                mail bcc: '', 
-                     body: '''
-Final Report: The pipeline has completed successfully. No action required.
-''', 
-                     cc: '', 
-                     from: '', 
-                     replyTo: '', 
-                     subject: 'Succès de la pipeline DevOps Project', 
-                     to: 'zarouxi@gmail.com, achref.werchfeni@esprit.tn'
+                // Validate secret management in configurations
+                sh 'mvn verify -DsecretManagement'
+            }
+        }
+
+        stage('Server Hardening Validation') {
+            steps {
+                // Validate server hardening configurations
+                sh 'mvn verify -DserverHardening'
+            }
+        }
+
+        // Operations Phase
+        stage('Fault Injection') {
+            steps {
+                // Inject faults for resilience testing
+                sh 'mvn test -DfaultInjection'
+            }
+        }
+
+        stage('Continuous Scanning and Monitoring') {
+            steps {
+                // Run ongoing security and compliance scans
+                sh 'mvn verify -DcontinuousScan'
             }
         }
     }
