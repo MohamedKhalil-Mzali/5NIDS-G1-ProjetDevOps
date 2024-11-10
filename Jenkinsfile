@@ -103,19 +103,11 @@ pipeline {
             }
         }
 
-        stage('Security Smoke Tests: ZAP Baseline Scan') {
+        stage('Security Scan: OWASP Dependency-Check') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-jenkins-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    }
-                    sh '''
-                        docker run --rm -v $(pwd):/zap/wrk:rw owasp/zap2docker-stable:2.11.1 zap-baseline.py \
-                        -t http://192.168.33.10:8089 \
-                        -r ZAP_Report.html \
-                        -J ZAP_Report.json \
-                        -z "-config api.disablekey=true"
-                    '''
+                    echo "Starting OWASP Dependency-Check..."
+                    sh 'mvn org.owasp:dependency-check-maven:check'
                 }
             }
         }
