@@ -1,4 +1,4 @@
-pipeline { 
+pipeline {
     agent any
 
     tools {
@@ -12,14 +12,52 @@ pipeline {
     }
 
     stages {
-        // Development Phase: Pre-commit security, static analysis, and container security
         stage('Git Checkout') {
             steps {
                 git branch: 'MedRayenBalghouthi-5NIDS1-G1', url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
 
-        stage('Static Code Analysis - SonarQube') {
+        stage('Compile Project') {
+            steps {
+                sh 'mvn clean compile'
+            }
+            post {
+                failure {
+                    echo 'Compilation failed!'
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                sh 'mvn test -U'
+            }
+            post {
+                failure {
+                    echo 'Tests failed!'
+                }
+            }
+        }
+
+        stage('Generate JaCoCo Coverage Report') {
+            steps {
+                sh 'mvn jacoco:report'
+            }
+        }
+
+        stage('JaCoCo Coverage Report') {
+            steps {
+                step([$class: 'JacocoPublisher',
+                      execPattern: '**/target/jacoco.exec',
+                      classPattern: '**/classes',
+                      sourcePattern: '**/src',
+                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
+                ])  
+            }
+        }
+
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
@@ -32,7 +70,7 @@ pipeline {
             }
         }
 
-        stage('Security Vulnerability Scan - Dependency Check') {
+        stage('Security Vulnerability Scan') {
             steps {
                 sh ''' 
                     mvn verify -Ddependency-check.skip=false \
@@ -52,37 +90,30 @@ pipeline {
             }
         }
 
-        stage('Security Unit Tests') {
+        stage('Publish OWASP Dependency-Check Report') {
             steps {
-                sh 'mvn test -DskipTests=false'
-            }
-            post {
-                failure {
-                    echo 'Security unit tests failed!'
-                }
+                step([$class: 'DependencyCheckPublisher',
+                      pattern: '**/dependency-check-report.html',
+                      healthy: '0',
+                      unhealthy: '1',
+                      failureThreshold: '1'
+                ])
             }
         }
 
-        // Acceptance Phase: Build and container security scanning
-        stage('Compile Project') {
+        stage('Deploy to Nexus Repository') {
             steps {
-                sh 'mvn clean compile'
+                sh ''' 
+                    mvn deploy -DskipTests \
+                    -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
+                '''
             }
             post {
-                failure {
-                    echo 'Compilation failed!'
+                success {
+                    echo 'Deployment to Nexus was successful!'
                 }
-            }
-        }
-
-        stage('Container Security Scan') {
-            steps {
-                // Using Trivy to scan the Docker image for vulnerabilities
-                sh 'trivy image rayenbal/5nids-g1:1.0.0'
-            }
-            post {
                 failure {
-                    echo 'Container security scan failed!'
+                    echo 'Deployment to Nexus failed!'
                 }
             }
         }
@@ -118,91 +149,28 @@ pipeline {
             }
         }
 
-        // Production Phase: Deploy and run security smoke tests
-        stage('Deploy to Nexus Repository') {
+        stage('Deploy with Docker Compose') {
             steps {
-                sh ''' 
-                    mvn deploy -DskipTests \
-                    -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
-                '''
-            }
-            post {
-                success {
-                    echo 'Deployment to Nexus was successful!'
-                }
-                failure {
-                    echo 'Deployment to Nexus failed!'
-                }
-            }
-        }
-
-        stage('Security Smoke Tests') {
-            steps {
-                // Running a simple smoke test for security validation
-                sh './run_security_smoke_tests.sh'
+                sh 'docker compose -f docker-compose.yml up -d'
             }
             post {
                 failure {
-                    echo 'Security smoke tests failed!'
+                    echo 'Docker compose up failed!'
                 }
             }
         }
 
-        stage('Secrets Management Validation') {
+        stage('Start Monitoring Containers') {
             steps {
-                // Placeholder for secrets management validation (implement as needed)
-                echo 'Checking secrets management configuration...'
+                sh 'docker start jenkins-prometheus-1 jenkins-mysqldb-1 grafana'
             }
             post {
                 failure {
-                    echo 'Secrets management validation failed!'
+                    echo 'Failed to start monitoring containers!'
                 }
             }
         }
 
-        stage('Server Hardening Validation') {
-            steps {
-                // Running Lynis to check server hardening
-                sh 'sudo lynis audit system --quick'
-            }
-            post {
-                failure {
-                    echo 'Server hardening validation failed!'
-                }
-            }
-        }
-
-        // Operations Phase: Continuous scanning and monitoring
-        stage('Fault Injection') {
-    steps {
-        script {
-            // Use the container that is running and related to your app
-            def containerName = 'jenkins-app-spring-1' // Use this container name for fault injection
-
-            // Using Pumba for fault injection testing
-            sh "sudo pumba pause --duration 10s ${containerName}"
-        }
-    }
-    post {
-        failure {
-            echo 'Fault injection test failed!'
-        }
-    }
-}
-
-        stage('Continuous Scanning and Monitoring') {
-            steps {
-                // Using Falco for continuous runtime security monitoring
-                sh 'sudo falco --config /etc/falco/falco.yaml'
-            }
-            post {
-                failure {
-                    echo 'Falco monitoring encountered an error!'
-                }
-            }
-        }
-
-        // Notification
         stage('Send Email Notification') {
             steps {
                 script {
