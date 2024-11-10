@@ -24,6 +24,9 @@
     <!-- Java version -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+
+    <!-- SonarQube Properties -->
+    <sonar.java.binaries>target/classes</sonar.java.binaries> <!-- Path to compiled classes -->
   </properties>
 
   <!-- Dependencies -->
@@ -152,15 +155,4 @@
                   <version>2.16.3.1081</version>
                   <type>jar</type>
                   <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                  <destFileName>sonar-scanner-api-batch.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-  </build>
-
-</project>
+                  <destFileName>sonar-scanner-
