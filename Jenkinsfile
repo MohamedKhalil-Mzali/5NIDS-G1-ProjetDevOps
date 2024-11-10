@@ -219,8 +219,7 @@ stage('Make Script Executable') {
     steps {
         script {
             // Use the container that is running and related to your app
-            def containerName = 'jenkins-app-spring-1' // You can change this to another container name if needed
-
+            def containerName = 'jenkins-mysqldb-1' 
             // Using Pumba for fault injection testing
             sh "sudo pumba pause --duration 10s ${containerName}"
         }
