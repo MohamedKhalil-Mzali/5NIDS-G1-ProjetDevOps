@@ -41,7 +41,7 @@ pipeline {
         stage('Building image') {
             steps {
                 // Login to Docker Hub and build Docker image
-                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
+                withCredentials([string(credentialsId: 'dockerhub.jenkins.token', variable: 'dockerhub_token')]) {
                     sh "echo ${dockerhub_token} | docker login -u wajdibenromdhane --password-stdin"
                 }
                 sh 'docker build -t wajdibenromdhane/gestion-station-ski:1.0.0 .'
@@ -51,7 +51,7 @@ pipeline {
         stage('Deploy image') {
             steps {
                 // Push Docker image to Docker Hub
-                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub_token')]) {
+                withCredentials([string(credentialsId: 'dockerhub.jenkins.token', variable: 'dockerhub_token')]) {
                     sh "echo ${dockerhub_token} | docker login -u wajdibenromdhane --password-stdin"
                     sh 'docker push wajdibenromdhane/gestion-station-ski:1.0.0'
                 }
