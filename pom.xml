@@ -137,7 +137,33 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Sonar Maven Plugin for analysis -->
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>4.0.0.4121</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sonar</goal>
+            </goals>
+            <configuration>
+              <!-- Set the path for compiled classes -->
+              <sonar.java.binaries>${project.build.outputDirectory}</sonar.java.binaries>
+              <!-- Exclude files if needed -->
+              <sonar.exclusions>**/*.test.*,**/*.mock.*</sonar.exclusions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-</project>
 
+  <!-- Add SonarQube properties -->
+  <properties>
+    <!-- Configure SonarQube server if needed -->
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
+    <sonar.login>YourSonarQubeAuthToken</sonar.login>
+  </properties>
+</project>
