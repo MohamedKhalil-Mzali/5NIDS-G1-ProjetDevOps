@@ -27,6 +27,7 @@
 
     <!-- SonarQube Properties -->
     <sonar.java.binaries>target/classes</sonar.java.binaries> <!-- Path to compiled classes -->
+    <sonar.sources>src/main/java</sonar.sources> <!-- Path to source code -->
   </properties>
 
   <!-- Dependencies -->
@@ -98,7 +99,9 @@
         <executions>
           <execution>
             <goals>
-              <goal>sonar</goal>
+              <goal>clean</goal>  <!-- Clean before building -->
+              <goal>install</goal> <!-- Ensure project is compiled and installed -->
+              <goal>sonar</goal>   <!-- Run Sonar analysis -->
             </goals>
           </execution>
         </executions>
