@@ -19,7 +19,7 @@
   <properties>
     <!-- SonarQube properties -->
     <sonar.host.url>http://localhost:9000</sonar.host.url> <!-- Change this to your SonarQube server URL -->
-    <sonar.login>your_sonar_token_here</sonar.login> <!-- Add your generated SonarQube token -->
+    <sonar.login>squ_09255498c044a144247f532f5d13e3d50c36e615</sonar.login> <!-- Add your generated SonarQube token -->
     <!-- Alternatively, you can use username/password authentication instead of a token -->
     <!-- <sonar.login>your_username</sonar.login> -->
     <!-- <sonar.password>your_password</sonar.password> -->
