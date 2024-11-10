@@ -68,8 +68,9 @@ pipeline {
                 sh 'docker start 3d9d88426efa'
             }
         }
-    }
-stage('Email Notification') {
+
+        // Move the Email Notification stage inside the stages block
+        stage('Email Notification') {
             steps {
                 mail bcc: '', 
                      body: '''
@@ -116,5 +117,4 @@ Final Report: The pipeline has completed successfully. No action required.
             }
         }
     }
-
-
+}
