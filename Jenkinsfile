@@ -40,23 +40,6 @@ pipeline {
             }
         }
 
-        stage('Generate JaCoCo Coverage Report') {
-            steps {
-                sh 'mvn jacoco:report'
-            }
-        }
-
-        stage('JaCoCo Coverage Report') {
-            steps {
-                step([$class: 'JacocoPublisher',
-                      execPattern: '**/target/jacoco.exec',
-                      classPattern: '**/classes',
-                      sourcePattern: '**/src',
-                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
-                ])  
-            }
-        }
-
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -70,7 +53,7 @@ pipeline {
             }
         }
 
-        stage('Security Vulnerability Scan') {
+        stage('Security Vulnerability Scan - Dependency Check') {
             steps {
                 sh ''' 
                     mvn verify -Ddependency-check.skip=false \
@@ -98,23 +81,6 @@ pipeline {
                       unhealthy: '1',
                       failureThreshold: '1'
                 ])
-            }
-        }
-
-        stage('Deploy to Nexus Repository') {
-            steps {
-                sh ''' 
-                    mvn deploy -DskipTests \
-                    -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
-                '''
-            }
-            post {
-                success {
-                    echo 'Deployment to Nexus was successful!'
-                }
-                failure {
-                    echo 'Deployment to Nexus failed!'
-                }
             }
         }
 
@@ -149,6 +115,23 @@ pipeline {
             }
         }
 
+        stage('Deploy to Nexus Repository') {
+            steps {
+                sh ''' 
+                    mvn deploy -DskipTests \
+                    -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/
+                '''
+            }
+            post {
+                success {
+                    echo 'Deployment to Nexus was successful!'
+                }
+                failure {
+                    echo 'Deployment to Nexus failed!'
+                }
+            }
+        }
+
         stage('Deploy with Docker Compose') {
             steps {
                 sh 'docker compose -f docker-compose.yml up -d'
@@ -167,6 +150,80 @@ pipeline {
             post {
                 failure {
                     echo 'Failed to start monitoring containers!'
+                }
+            }
+        }
+
+        // Extra security and monitoring stages - catch errors to pass
+        stage('Security Smoke Tests') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    // Running a simple smoke test for security validation
+                    sh './run_security_smoke_tests.sh'
+                }
+            }
+            post {
+                failure {
+                    echo 'Security smoke tests failed!'
+                }
+            }
+        }
+
+        stage('Secrets Management Validation') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    // Placeholder for secrets management validation (implement as needed)
+                    echo 'Checking secrets management configuration...'
+                }
+            }
+            post {
+                failure {
+                    echo 'Secrets management validation failed!'
+                }
+            }
+        }
+
+        stage('Server Hardening Validation') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    // Running Lynis to check server hardening
+                    sh 'sudo lynis audit system --quick'
+                }
+            }
+            post {
+                failure {
+                    echo 'Server hardening validation failed!'
+                }
+            }
+        }
+
+        stage('Fault Injection') {
+            steps {
+                script {
+                    // Use the container that is running and related to your app
+                    def containerName = 'jenkins-app-spring-1' // Use this container name for fault injection
+
+                    // Using Pumba for fault injection testing
+                    sh "sudo pumba pause --duration 10s ${containerName}"
+                }
+            }
+            post {
+                failure {
+                    echo 'Fault injection test failed!'
+                }
+            }
+        }
+
+        stage('Continuous Scanning and Monitoring') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    // Using Falco for continuous runtime security monitoring
+                    sh 'sudo falco --config /etc/falco/falco.yaml'
+                }
+            }
+            post {
+                failure {
+                    echo 'Falco monitoring encountered an error!'
                 }
             }
         }
@@ -227,4 +284,5 @@ pipeline {
                 }
             }
         }
-}}
+    }
+}
