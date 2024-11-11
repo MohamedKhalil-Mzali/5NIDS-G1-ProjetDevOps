@@ -357,6 +357,12 @@ stage('Send Email Notification') {
                      to: 'rayenbal55@gmail.com'
         }
     }
+post {
+        always {
+            echo "Email notification sent."
+        }
+}
+
 }
 
 
