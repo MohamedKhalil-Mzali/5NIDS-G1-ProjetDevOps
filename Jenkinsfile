@@ -252,7 +252,7 @@ stage('Make Script Executable') {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             // Run Falco in a privileged container with necessary mounts
             sh '''
-           sudo docker run --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock -v /etc/falco:/etc/falco --entrypoint cat falcosecurity/falco:latest /etc/falco/falco.yaml
+           sudo docker run --rm --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock falcosecurity/falco:latest
             '''
         }
     }
