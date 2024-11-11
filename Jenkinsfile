@@ -161,7 +161,7 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start jenkins-prometheus-1 grafana'
+                sh 'docker start jenkins-prometheus-1 f9c7c413a16d grafana'
             }
             post {
                 failure {
