@@ -201,16 +201,26 @@ stage('Make Script Executable') {
             }
         }
 
-        stage('Server Hardening Validation') {
+      stage('Server Hardening Validation - Lynis') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    // Running Lynis to check server hardening
-                    sh 'sudo lynis audit system --quick'
+                    sh '''
+                    sudo mkdir -p /tmp/lynis_reports
+                    sudo lynis audit system --quick --report-file /tmp/lynis_reports/lynis-report.dat
+                    sudo cp /tmp/lynis_reports/lynis-report.dat /tmp/lynis_reports/lynis-report.html
+                    sed -i '1s/^/<html><body><pre>/' /tmp/lynis_reports/lynis-report.html
+                    echo "</pre></body></html>" >> /tmp/lynis_reports/lynis-report.html
+                    '''
                 }
             }
             post {
-                failure {
-                    echo 'Server hardening validation failed!'
+                always {
+                    publishHTML([allowMissing: true,
+                                 alwaysLinkToLastBuild: true,
+                                 keepAll: true,
+                                 reportDir: '/tmp/lynis_reports',
+                                 reportFiles: 'lynis-report.html',
+                                 reportName: 'Lynis Security Report'])
                 }
             }
         }
@@ -231,22 +241,37 @@ stage('Make Script Executable') {
     }
 }
 
-        stage('Continuous Scanning and Monitoring') {
-    steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            // Run Falco in a privileged container with necessary mounts
-            sh '''
-           sudo docker run --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock -v /etc/falco:/etc/falco --entrypoint cat falcosecurity/falco:latest /etc/falco/falco.yaml
-            '''
+        stage('Continuous Scanning and Monitoring - Falco') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh '''
+                    sudo mkdir -p /tmp/falco_logs
+                    sudo docker run --privileged -v /proc:/host/proc:ro \
+                                    -v /boot:/host/boot:ro \
+                                    -v /lib/modules:/host/lib/modules:ro \
+                                    -v /usr:/host/usr:ro \
+                                    -v /etc:/host/etc:ro \
+                                    -v /var/run/docker.sock:/var/run/docker.sock \
+                                    -e FALCO_LOG_STDOUT=true \
+                                    falcosecurity/falco:latest > /tmp/falco_logs/falco.html &
+                    sleep 10
+                    sudo pkill falco
+                    sed -i '1s/^/<html><body><pre>/' /tmp/falco_logs/falco.html
+                    echo "</pre></body></html>" >> /tmp/falco_logs/falco.html
+                    '''
+                }
+            }
+            post {
+                always {
+                    publishHTML([allowMissing: true,
+                                 alwaysLinkToLastBuild: true,
+                                 keepAll: true,
+                                 reportDir: '/tmp/falco_logs',
+                                 reportFiles: 'falco.html',
+                                 reportName: 'Falco Monitoring Log'])
+                }
+            }
         }
-    }
-    post {
-        failure {
-            echo 'Falco monitoring encountered an error!'
-        }
-    }
-}
-
         stage('Send Email Notification') {
             steps {
                 script {
