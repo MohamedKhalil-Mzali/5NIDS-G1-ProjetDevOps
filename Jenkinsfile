@@ -321,25 +321,6 @@ pipeline {
                             <div>🔹 <strong>Result:</strong> <span class="status">${currentBuild.currentResult}</span></div>
                         </div>
 
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Stage</th>
-                                    <th>Status</th>
-                                    <th>Duration</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% currentBuild.buildCauses.each { cause -> %>
-                                    <tr>
-                                        <td>${cause.shortDescription}</td>
-                                        <td class="stage-status <%= cause.result == 'SUCCESS' ? 'stage-success' : 'stage-failure' %>">${cause.result}</td>
-                                        <td>${cause.durationString}</td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-
                         <p>Access the reports:</p>
                         <ul>
                             <li><a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="report-link">📊 JaCoCo Coverage Report</a></li>
@@ -365,8 +346,6 @@ pipeline {
         }
     }
 }
-
-
-
+ 
     }
 }
