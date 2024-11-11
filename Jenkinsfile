@@ -219,115 +219,88 @@ stage('Send Email Notification') {
         script {
             // Determine the subject based on build result
             def subject = currentBuild.currentResult == 'SUCCESS' ? 
-                "✨ Build Success: ${currentBuild.fullDisplayName}" : 
-                "❗ Build Failure: ${currentBuild.fullDisplayName}"
+                "✅ Build Success: ${currentBuild.fullDisplayName}" : 
+                "❌ Build Failure: ${currentBuild.fullDisplayName}"
 
             // Create the email body
             def body = """
                 <html>
                 <head>
                     <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@300;600&display=swap');
                         body {
-                            font-family: 'Poppins', sans-serif;
-                            background: radial-gradient(circle, #0f2027, #203a43, #2c5364);
-                            color: #ffffff;
+                            font-family: 'Arial', sans-serif;
+                            background-color: #f4f6f9;
+                            color: #333333;
                             margin: 0;
                             padding: 0;
-                            animation: backgroundShift 10s infinite alternate;
                         }
                         .container {
                             max-width: 800px;
                             margin: 30px auto;
-                            padding: 25px;
-                            background: rgba(0, 0, 0, 0.9);
-                            border-radius: 15px;
-                            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-                            overflow: hidden;
-                            position: relative;
-                            backdrop-filter: blur(10px);
+                            padding: 20px;
+                            background-color: #ffffff;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                         }
                         h2 {
-                            font-family: 'Orbitron', sans-serif;
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
                             text-align: center;
-                            font-size: 34px;
-                            margin-bottom: 25px;
-                            letter-spacing: 2px;
-                            text-shadow: 0 0 15px ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
+                            font-size: 28px;
+                            margin-bottom: 20px;
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#28a745' : '#dc3545'};
                         }
                         .divider {
                             height: 2px;
-                            background: linear-gradient(to right, #00ff88, #ff0044);
-                            border: none;
+                            background-color: #f1f1f1;
                             margin: 20px 0;
-                            animation: gradientShift 6s infinite alternate;
                         }
-                        p, th, td {
+                        p {
                             font-size: 16px;
-                            line-height: 1.8;
-                            color: #b8c1c1;
+                            line-height: 1.6;
+                            color: #555555;
                         }
                         .summary {
-                            display: grid;
-                            grid-template-columns: repeat(2, 1fr);
-                            gap: 15px;
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: space-between;
                             margin-top: 20px;
                         }
                         .summary-item {
-                            background-color: rgba(50, 50, 50, 0.8);
-                            border-radius: 8px;
+                            background-color: #f8f9fa;
+                            border-radius: 6px;
                             padding: 15px;
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: space-between;
-                            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-                            transform: scale(0.95);
-                            transition: transform 0.3s ease-in-out;
+                            width: 48%;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                            margin-bottom: 15px;
                         }
-                        .summary-item:hover {
-                            transform: scale(1.02);
+                        .summary-item strong {
+                            color: #333333;
                         }
                         .report-links {
-                            margin-top: 25px;
-                            display: flex;
-                            flex-direction: column;
-                            gap: 10px;
+                            margin-top: 20px;
                         }
                         .report-link {
                             display: inline-block;
                             padding: 12px 18px;
                             border-radius: 6px;
-                            background-color: #3d84a8;
+                            background-color: #007bff;
                             color: #ffffff;
                             text-decoration: none;
                             font-weight: bold;
                             font-size: 14px;
-                            text-align: center;
-                            transition: background-color 0.3s, box-shadow 0.3s;
+                            margin-top: 10px;
+                            transition: background-color 0.3s;
                         }
                         .report-link:hover {
-                            background-color: #00bfff;
-                            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7);
+                            background-color: #0056b3;
                         }
                         .footer {
                             font-size: 14px;
-                            color: #aaaaaa;
+                            color: #888888;
                             text-align: center;
                             margin-top: 30px;
                         }
                         .footer span {
-                            color: #00bfff;
-                        }
-                        @keyframes backgroundShift {
-                            to {
-                                background: radial-gradient(circle, #1a2932, #162e44, #134057);
-                            }
-                        }
-                        @keyframes gradientShift {
-                            to {
-                                background: linear-gradient(to right, #ff0044, #00ff88);
-                            }
+                            color: #007bff;
                         }
                     </style>
                 </head>
@@ -341,7 +314,7 @@ stage('Send Email Notification') {
                             <div class="summary-item">🔹 <strong>Build Number:</strong> ${currentBuild.number}</div>
                             <div class="summary-item">🔹 <strong>Project:</strong> ${env.JOB_NAME}</div>
                             <div class="summary-item">🔹 <strong>Build Duration:</strong> ${currentBuild.durationString}</div>
-                            <div class="summary-item">🔹 <strong>Result:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};">${currentBuild.currentResult}</span></div>
+                            <div class="summary-item">🔹 <strong>Result:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? '#28a745' : '#dc3545'};">${currentBuild.currentResult}</span></div>
                         </div>
                         <p>Detailed Reports:</p>
                         <div class="report-links">
@@ -367,6 +340,7 @@ stage('Send Email Notification') {
         }
     }
 }
+
 
 
     }
