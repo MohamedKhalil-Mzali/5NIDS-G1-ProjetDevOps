@@ -214,7 +214,7 @@ pipeline {
                 }
             }
         }
-stage('Send Email Notification') { 
+stage('Send Email Notification') {
     steps {
         script {
             // Determine the subject based on build result
@@ -227,77 +227,106 @@ stage('Send Email Notification') {
                 <html>
                 <head>
                     <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+                        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@300;600&display=swap');
                         body {
                             font-family: 'Poppins', sans-serif;
-                            background-color: #101010;
+                            background: radial-gradient(circle, #0f2027, #203a43, #2c5364);
                             color: #ffffff;
                             margin: 0;
                             padding: 0;
+                            animation: backgroundShift 10s infinite alternate;
                         }
                         .container {
                             max-width: 800px;
-                            margin: 20px auto;
-                            padding: 30px;
-                            background: linear-gradient(145deg, #1a1a2e, #0f3460);
+                            margin: 30px auto;
+                            padding: 25px;
+                            background: rgba(0, 0, 0, 0.9);
                             border-radius: 15px;
-                            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+                            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+                            overflow: hidden;
+                            position: relative;
+                            backdrop-filter: blur(10px);
                         }
                         h2 {
+                            font-family: 'Orbitron', sans-serif;
                             color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
                             text-align: center;
-                            font-size: 30px;
-                            margin-bottom: 20px;
-                            text-shadow: 0 0 10px #00ff88, 0 0 20px ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
+                            font-size: 34px;
+                            margin-bottom: 25px;
+                            letter-spacing: 2px;
+                            text-shadow: 0 0 15px ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
+                        }
+                        .divider {
+                            height: 2px;
+                            background: linear-gradient(to right, #00ff88, #ff0044);
+                            border: none;
+                            margin: 20px 0;
+                            animation: gradientShift 6s infinite alternate;
                         }
                         p, th, td {
                             font-size: 16px;
-                            line-height: 1.6;
+                            line-height: 1.8;
+                            color: #b8c1c1;
                         }
                         .summary {
-                            display: flex;
-                            flex-direction: column;
-                            margin-top: 25px;
-                            padding: 15px;
-                            background-color: rgba(255, 255, 255, 0.05);
-                            border-radius: 10px;
-                            border: 1px solid #3d84a8;
-                            box-shadow: 0 0 10px rgba(61, 132, 168, 0.5);
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 15px;
+                            margin-top: 20px;
                         }
                         .summary-item {
                             background-color: rgba(50, 50, 50, 0.8);
                             border-radius: 8px;
-                            padding: 12px;
-                            margin-top: 10px;
-                            font-size: 15px;
-                            opacity: 0;
-                            transform: translateX(-20px);
-                            animation: slideIn 0.6s forwards;
+                            padding: 15px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: space-between;
+                            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+                            transform: scale(0.95);
+                            transition: transform 0.3s ease-in-out;
+                        }
+                        .summary-item:hover {
+                            transform: scale(1.02);
+                        }
+                        .report-links {
+                            margin-top: 25px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 10px;
                         }
                         .report-link {
                             display: inline-block;
-                            padding: 10px 15px;
+                            padding: 12px 18px;
                             border-radius: 6px;
                             background-color: #3d84a8;
                             color: #ffffff;
                             text-decoration: none;
                             font-weight: bold;
-                            transition: background-color 0.3s;
-                            margin-top: 10px;
+                            font-size: 14px;
+                            text-align: center;
+                            transition: background-color 0.3s, box-shadow 0.3s;
                         }
                         .report-link:hover {
                             background-color: #00bfff;
+                            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7);
                         }
                         .footer {
-                            font-size: 13px;
+                            font-size: 14px;
                             color: #aaaaaa;
                             text-align: center;
                             margin-top: 30px;
                         }
-                        @keyframes slideIn {
+                        .footer span {
+                            color: #00bfff;
+                        }
+                        @keyframes backgroundShift {
                             to {
-                                opacity: 1;
-                                transform: translateX(0);
+                                background: radial-gradient(circle, #1a2932, #162e44, #134057);
+                            }
+                        }
+                        @keyframes gradientShift {
+                            to {
+                                background: linear-gradient(to right, #ff0044, #00ff88);
                             }
                         }
                     </style>
@@ -305,23 +334,24 @@ stage('Send Email Notification') {
                 <body>
                     <div class="container">
                         <h2>${subject}</h2>
-                        <p>Hello Team,</p>
-                        <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed. Here is the overview:</p>
+                        <hr class="divider" />
+                        <p>Dear Team,</p>
+                        <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed. Below is a quick summary:</p>
                         <div class="summary">
                             <div class="summary-item">🔹 <strong>Build Number:</strong> ${currentBuild.number}</div>
                             <div class="summary-item">🔹 <strong>Project:</strong> ${env.JOB_NAME}</div>
                             <div class="summary-item">🔹 <strong>Build Duration:</strong> ${currentBuild.durationString}</div>
                             <div class="summary-item">🔹 <strong>Result:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};">${currentBuild.currentResult}</span></div>
                         </div>
-
-                        <p>Access Reports:</p>
-                        <a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="report-link">📊 JaCoCo Coverage Report</a><br>
-                        <a href="${env.BUILD_URL}artifact/dependency-check-report.html" class="report-link">⚠️ OWASP Dependency-Check Report</a><br>
-                        <a href="${env.BUILD_URL}artifact/tmp/lynis_reports/lynis-report.html" class="report-link">🛡️ Lynis Security Report</a><br>
-
+                        <p>Detailed Reports:</p>
+                        <div class="report-links">
+                            <a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="report-link">📊 JaCoCo Coverage Report</a>
+                            <a href="${env.BUILD_URL}artifact/dependency-check-report.html" class="report-link">⚠️ OWASP Dependency-Check Report</a>
+                            <a href="${env.BUILD_URL}artifact/tmp/lynis_reports/lynis-report.html" class="report-link">🛡️ Lynis Security Report</a>
+                        </div>
                         <div class="footer">
-                            <p>Generated by Jenkins CI/CD Pipeline, Team DevOps</p>
-                            <p>Admin: Rayen</p>
+                            <p>Generated by <span>Jenkins CI/CD</span>, Team DevOps</p>
+                            <p>Contact Admin: Rayen</p>
                         </div>
                     </div>
                 </body>
