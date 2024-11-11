@@ -252,21 +252,26 @@ stage('Make Script Executable') {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             sh '''
                 # Pull and prepare Falco if necessary
-                sudo docker run --rm --privileged \
-                    -v /host:/host \
-                    -v /proc:/host/proc \
-                    -v /sys:/host/sys \
-                    -v /var/run/docker.sock:/var/run/docker.sock \
-                    -v /etc/falco:/etc/falco \
-                    falcosecurity/falco:latest \
-                    /bin/bash -c "falco --validate /etc/falco/falco.yaml"
+                sudo docker pull falcosecurity/falco:latest
+                
+                # Validate Falco configuration file, if it exists
+                if [ -f /etc/falco/falco.yaml ]; then
+                    sudo docker run --rm --privileged \
+                        -v /host:/host \
+                        -v /proc:/host/proc \
+                        -v /sys:/host/sys \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v /etc/falco:/etc/falco \
+                        falcosecurity/falco:latest \
+                        falco --validate /etc/falco/falco.yaml
+                fi
 
                 # Ensure log directory exists with correct permissions
                 sudo mkdir -p /var/tmp/falco_logs
                 sudo chown -R jenkins:jenkins /var/tmp/falco_logs
                 sudo chmod 777 /var/tmp/falco_logs
 
-                # Run Falco with output directed to HTML log file
+                # Run Falco with output directed to log file
                 sudo docker run --rm --privileged \
                     -v /proc:/host/proc:ro \
                     -v /boot:/host/boot:ro \
@@ -290,7 +295,6 @@ stage('Make Script Executable') {
     }
 }
 
-
 stage('Publish Falco Report') {
     steps {
         publishHTML([
@@ -303,6 +307,7 @@ stage('Publish Falco Report') {
         ])
     }
 }
+
 
 
         stage('Send Email Notification') {
