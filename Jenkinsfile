@@ -214,6 +214,23 @@ pipeline {
                 }
             }
         }
+stage('Send WhatsApp Notification') {
+            steps {
+                script {
+                    def message = currentBuild.currentResult == 'SUCCESS' ? 
+                        "✅ Build Success: ${currentBuild.fullDisplayName}" : 
+                        "❌ Build Failure: ${currentBuild.fullDisplayName}"
+
+                    // Send WhatsApp message using Twilio Notifier Plugin
+                    twilioSend(
+                        body: message,
+                        to: 'whatsapp:+21628221389',  // Recipient's phone number
+                        from: 'whatsapp:+21628221389' // Your Twilio phone number
+                    )
+                }
+            }
+}
+
 stage('Send Email Notification') {
     steps {
         script {
