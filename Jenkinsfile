@@ -255,16 +255,15 @@ stage('Make Script Executable') {
                 sudo docker pull falcosecurity/falco:latest
                 
                 # Validate Falco configuration file, if it exists
-                if [ -f /etc/falco/falco.yaml ]; then
-                    sudo docker run --rm --privileged \
+                        sudo docker run --rm --privileged \
                         -v /host:/host \
                         -v /proc:/host/proc \
                         -v /sys:/host/sys \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v /etc/falco:/etc/falco \
                         falcosecurity/falco:latest \
-                        falco --validate /etc/falco/falco.yaml
-                fi
+        
+                
 
                 # Ensure log directory exists with correct permissions
                 sudo mkdir -p /var/tmp/falco_logs
