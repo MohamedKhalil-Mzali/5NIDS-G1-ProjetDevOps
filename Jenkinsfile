@@ -269,10 +269,10 @@ stage('Make Script Executable') {
 stage('Publish Falco Report') {
     steps {
         publishHTML([ 
-    reportName: 'Lynis Report', 
-    reportDir: '/tmp/lynis_reports', 
-    reportFiles: 'lynis-report.html', 
-    keepAll: true   // Add this parameter
+    reportName: 'Falco Monitoring Log', 
+    reportDir: '/tmp/falco_logs', 
+    reportFiles: 'falco.html', 
+    keepAll: true   // Add this parameter to keep all reports
 ])
     }
 }
