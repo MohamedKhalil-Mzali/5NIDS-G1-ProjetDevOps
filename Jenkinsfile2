@@ -39,7 +39,7 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-        
+
         stage('Scan') {
             steps {
                 // Run SonarQube analysis
@@ -49,12 +49,24 @@ pipeline {
             }
         }
 
+        stage('System Security Check - Lynis') {
+            steps {
+                script {
+                    // Exécution de l'audit de sécurité système avec Lynis
+                    sh 'lynis audit system | tee lynis_audit_output.txt'
+                    
+                    // Archivage des résultats pour consultation ultérieure
+                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
         stage('Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository, skipping tests
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
-        }
+        } 
 
         stage('Building image') {
             steps {
@@ -63,6 +75,16 @@ pipeline {
                     sh "echo ${dockerhub_token} | docker login -u wajdibenromdhane --password-stdin"
                 }
                 sh 'docker build -t wajdibenromdhane/gestion-station-ski:1.0.0 .'
+            }
+        } 
+
+      stage('Security Scan with Trivy') {
+            steps {
+                script {
+                    // Effectuer un scan avec Trivy pour vérifier la présence de vulnérabilités dans l'image Docker
+                    echo "Lancement du scan de sécurité avec Trivy..."
+                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL wajdibenromdhane/gestion-station-ski:1.0.0'
+                }
             }
         }
 
@@ -89,6 +111,15 @@ pipeline {
                 sh 'docker start 40d02048d5f4'
             }
         }
+       
+       stage('Security Scan : Nmap') {
+    steps {
+        script {
+            echo "Starting Nmap Security Scan..."
+            sh 'nmap -sT -p 1-65535 -v localhost'
+        }
+    }
+}
         stage('Email Notification') {
             steps {
                 mail bcc: '', 
@@ -134,6 +165,6 @@ Final Report: The pipeline has completed successfully. No action required.
                     to: 'wajdiben2019@gmail.com, wajdi.benromdhane@esprit.tn'
                 )
             }
-        }
+        }  
     }
 }
