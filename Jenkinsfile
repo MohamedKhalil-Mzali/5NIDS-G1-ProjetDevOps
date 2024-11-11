@@ -250,13 +250,36 @@ stage('Make Script Executable') {
        stage('Continuous Scanning and Monitoring - Falco') {
     steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            // Ensure the directory exists and has proper permissions
             sh '''
-                       sudo docker run --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock -v /etc/falco:/etc/falco --entrypoint cat falcosecurity/falco:latest /etc/falco/falco.yaml
-                sudo mkdir -p /var/tmp/falco_logs  # Create directory if it doesn't exist
-                sudo chown jenkins:jenkins /var/tmp/falco_logs  # Ensure Jenkins user owns the directory
-                sudo chmod 777 /var/tmp/falco_logs  # Give write access to the Jenkins user for testing
-                falco -c /etc/falco/falco.yaml --output /var/tmp/falco_logs/falco.html  # Run Falco and output to HTML
+                # Pull and prepare Falco if necessary
+                sudo docker run --rm --privileged \
+                    -v /host:/host \
+                    -v /proc:/host/proc \
+                    -v /sys:/host/sys \
+                    -v /var/run/docker.sock:/var/run/docker.sock \
+                    -v /etc/falco:/etc/falco \
+                    falcosecurity/falco:latest \
+                    --validate /etc/falco/falco.yaml
+
+                # Ensure log directory exists with correct permissions
+                sudo mkdir -p /var/tmp/falco_logs
+                sudo chown -R jenkins:jenkins /var/tmp/falco_logs
+                sudo chmod 777 /var/tmp/falco_logs
+
+                # Run Falco with output directed to HTML log file
+                sudo docker run --rm --privileged \
+                    -v /proc:/host/proc:ro \
+                    -v /boot:/host/boot:ro \
+                    -v /lib/modules:/host/lib/modules:ro \
+                    -v /usr:/host/usr:ro \
+                    -v /etc/falco:/etc/falco \
+                    -v /var/tmp/falco_logs:/output \
+                    falcosecurity/falco:latest -c /etc/falco/falco.yaml > /var/tmp/falco_logs/falco.log
+
+                # Wrap output log in HTML for display
+                sudo bash -c 'echo "<html><body><pre>" > /var/tmp/falco_logs/falco.html'
+                sudo cat /var/tmp/falco_logs/falco.log >> /var/tmp/falco_logs/falco.html
+                sudo bash -c 'echo "</pre></body></html>" >> /var/tmp/falco_logs/falco.html'
             '''
         }
     }
@@ -269,17 +292,17 @@ stage('Make Script Executable') {
 
 stage('Publish Falco Report') {
     steps {
-        publishHTML([ 
-    reportName: 'Falco Monitoring Log', 
-    reportDir: '/tmp/falco_logs', 
-    reportFiles: 'falco.html', 
-    keepAll: true,   // Keeps all reports
-    allowMissing: false,  // Set to false to fail the build if the report is missing
-    alwaysLinkToLastBuild: true  // Link the report to the last build
-])
-
+        publishHTML([
+            reportName: 'Falco Monitoring Log',
+            reportDir: '/var/tmp/falco_logs',
+            reportFiles: 'falco.html',
+            keepAll: true,
+            allowMissing: false,
+            alwaysLinkToLastBuild: true
+        ])
     }
 }
+
 
         stage('Send Email Notification') {
             steps {
