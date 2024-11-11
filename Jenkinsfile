@@ -218,14 +218,7 @@ pipeline {
                stage('Send Email Notification') {
     steps {
         script {
-            // Get the build cause
-            def causes = currentBuild.rawBuild.getCauses()
-            def causeMessage = "No cause found."
-            if (causes && !causes.isEmpty()) {
-                causeMessage = causes[0].getShortDescription()  // Correctly access the cause's shortDescription
-            }
-
-            // Determine subject based on build result
+            // Determine the subject based on build result
             def subject = currentBuild.currentResult == 'SUCCESS' ? 
                 "✨ Build Success: ${currentBuild.fullDisplayName}" : 
                 "❗ Build Failure: ${currentBuild.fullDisplayName}"
@@ -326,7 +319,6 @@ pipeline {
                             <div>🔹 <strong>Project:</strong> ${env.JOB_NAME}</div>
                             <div>🔹 <strong>Build Duration:</strong> ${currentBuild.durationString}</div>
                             <div>🔹 <strong>Result:</strong> <span class="status">${currentBuild.currentResult}</span></div>
-                            <div>🔹 <strong>Build Cause:</strong> ${causeMessage}</div>
                         </div>
 
                         <table>
@@ -373,6 +365,8 @@ pipeline {
         }
     }
 }
+
+
 
     }
 }
