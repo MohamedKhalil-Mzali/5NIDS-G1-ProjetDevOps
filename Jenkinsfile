@@ -161,7 +161,7 @@ pipeline {
 
         stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start jenkins-prometheus-1 f9c7c413a16d grafana'
+                sh 'docker start 5-nids-1-rayen-balghouthi-g1-prometheus-1 grafana'
             }
             post {
                 failure {
@@ -187,19 +187,7 @@ stage('Make Script Executable') {
     }
 }
 
-        stage('Secrets Management Validation') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    // Placeholder for secrets management validation (implement as needed)
-                    echo 'Checking secrets management configuration...'
-                }
-            }
-            post {
-                failure {
-                    echo 'Secrets management validation failed!'
-                }
-            }
-        }
+       
 
       stage('Server Hardening Validation - Lynis') {
             steps {
@@ -231,68 +219,7 @@ stage('Make Script Executable') {
 }
         
 
-        stage('Fault Injection') {
-    steps {
-        script {
-            // Use the container that is running and related to your app
-            def containerName = 'jenkins-mysqldb-1' 
-            // Using Pumba for fault injection testing
-            sh "sudo pumba pause --duration 10s ${containerName}"
-        }
-    }
-    post {
-        failure {
-            echo 'Fault injection test failed!'
-        }
-    }
-}
-
-    stage('Continuous Scanning and Monitoring') {
-    steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            sh '''
-                # Ensure that falco.yaml is present and valid
-                if [ ! -f /etc/falco/falco.yaml ]; then
-                    echo "falco.yaml not found, downloading default config."
-                    sudo wget -O /etc/falco/falco.yaml https://raw.githubusercontent.com/falcosecurity/falco/master/falco.yaml
-                fi
-                
-                # Create log directory with proper permissions
-                sudo mkdir -p /var/tmp/falco_logs
-                sudo chown -R jenkins:jenkins /var/tmp/falco_logs
-                sudo chmod 777 /var/tmp/falco_logs
-
-                # Run Falco in a privileged Docker container with necessary mounts
-                sudo docker run --rm --privileged \
-                    -v /host:/host \
-                    -v /proc:/host/proc:ro \
-                    -v /sys:/host/sys:ro \
-                    -v /var/run/docker.sock:/var/run/docker.sock \
-                    -v /etc/falco:/etc/falco \
-                    -v /var/tmp/falco_logs:/output \
-                    falcosecurity/falco:latest -c /etc/falco/falco.yaml
-            '''
-        }
-    }
-    post {
-        failure {
-            echo 'Falco monitoring encountered an error!'
-        }
-    }
-}
-
-stage('Publish Falco Report') {
-    steps {
-        publishHTML([
-            reportName: 'Falco Monitoring Log',
-            reportDir: '/var/tmp/falco_logs',
-            reportFiles: 'falco.html',
-            keepAll: true,
-            allowMissing: false,
-            alwaysLinkToLastBuild: true
-        ])
-    }
-}
+     
 
 
 
