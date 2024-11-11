@@ -222,7 +222,7 @@ pipeline {
     steps {
         script {
             // Use withCredentials block to securely inject credentials
-            withCredentials([usernamePassword(credentialsId: 'twilio_account_sid', usernameVariable: 'TWILIO_ACCOUNT_SID', passwordVariable: 'TWILIO_AUTH_TOKEN')]) {
+            withCredentials([usernamePassword(credentialsId: 'TWILIO_ACCOUNT_SID', usernameVariable: 'TWILIO_ACCOUNT_SID', passwordVariable: 'TWILIO_AUTH_TOKEN')]) {
                 def message = currentBuild.currentResult == 'SUCCESS' ?
                     "✅ Build Success: ${currentBuild.fullDisplayName}" :
                     "❌ Build Failure: ${currentBuild.fullDisplayName}"
