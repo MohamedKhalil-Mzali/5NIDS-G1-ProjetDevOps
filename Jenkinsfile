@@ -252,6 +252,7 @@ stage('Make Script Executable') {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             // Ensure the directory exists and has proper permissions
             sh '''
+                       sudo docker run --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock -v /etc/falco:/etc/falco --entrypoint cat falcosecurity/falco:latest /etc/falco/falco.yaml
                 sudo mkdir -p /var/tmp/falco_logs  # Create directory if it doesn't exist
                 sudo chown jenkins:jenkins /var/tmp/falco_logs  # Ensure Jenkins user owns the directory
                 sudo chmod 777 /var/tmp/falco_logs  # Give write access to the Jenkins user for testing
