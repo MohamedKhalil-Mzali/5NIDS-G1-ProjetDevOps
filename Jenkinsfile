@@ -230,7 +230,7 @@ stage('Send Email Notification') {
                         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
                         body {
                             font-family: 'Poppins', sans-serif;
-                            background-color: #121212;
+                            background-color: #141414;
                             color: #ffffff;
                             margin: 0;
                             padding: 0;
@@ -239,13 +239,13 @@ stage('Send Email Notification') {
                             max-width: 800px;
                             margin: 20px auto;
                             padding: 30px;
-                            background-color: #1f1f1f;
+                            background-color: #1e1e1e;
                             border-radius: 12px;
                             box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
                             border: 1px solid #00e5ff;
                         }
                         h2 {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff1744'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff00' : '#ff0033'};
                             text-align: center;
                             font-size: 26px;
                             margin-bottom: 20px;
@@ -259,23 +259,23 @@ stage('Send Email Notification') {
                             border-spacing: 0;
                             border-collapse: collapse;
                             margin-top: 20px;
-                            background-color: #2c2c2c;
+                            background-color: #2a2a2a;
                         }
                         th, td {
                             padding: 14px;
-                            border: 1px solid #444;
+                            border: 1px solid #555;
                         }
                         th {
-                            background-color: #333;
+                            background-color: #444;
                             color: #00e5ff;
                             font-weight: bold;
                         }
                         .status {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff1744'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff00' : '#ff0033'};
                         }
                         .footer {
                             font-size: 13px;
-                            color: #aaa;
+                            color: #bbbbbb;
                             text-align: center;
                             margin-top: 30px;
                         }
@@ -342,6 +342,6 @@ stage('Send Email Notification') {
                      to: 'rayenbal55@gmail.com'
         }
     }
-} 
+}
     }
 }
