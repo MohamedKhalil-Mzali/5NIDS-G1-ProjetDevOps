@@ -217,13 +217,16 @@ stage('Make Script Executable') {
         }
         stage('Publish Lynis Report') {
     steps {
-        // Publish the Lynis HTML report to Jenkins web UI
-        publishHTML([
-            reportName: 'Lynis Report',
-            reportDir: '/tmp/lynis_reports',
-            reportFiles: 'lynis-report.html',
-            keepAll: true
-        ])
+        script {
+            // Assuming the HTML report was generated earlier in the pipeline
+            publishHTML([ 
+                reportName: 'Lynis Report',
+                reportDir: '/tmp/lynis_reports',
+                reportFiles: 'lynis-report.html',
+                alwaysLinkToLastBuild: true,
+                allowMissing: false
+            ])
+        }
     }
 }
         
