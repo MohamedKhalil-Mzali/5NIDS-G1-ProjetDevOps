@@ -213,17 +213,20 @@ stage('Make Script Executable') {
                     '''
                 }
             }
-            post {
-                always {
-                    publishHTML([allowMissing: true,
-                                 alwaysLinkToLastBuild: true,
-                                 keepAll: true,
-                                 reportDir: '/tmp/lynis_reports',
-                                 reportFiles: 'lynis-report.html',
-                                 reportName: 'Lynis Security Report'])
-                }
-            }
+            
         }
+        stage('Publish Lynis Report') {
+    steps {
+        // Publish the Lynis HTML report to Jenkins web UI
+        publishHTML([
+            reportName: 'Lynis Report',
+            reportDir: '/tmp/lynis_reports',
+            reportFiles: 'lynis-report.html',
+            keepAll: true
+        ])
+    }
+}
+        
 
         stage('Fault Injection') {
     steps {
