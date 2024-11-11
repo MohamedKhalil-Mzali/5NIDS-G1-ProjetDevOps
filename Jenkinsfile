@@ -40,7 +40,7 @@ pipeline {
                 }
             }
         }
-       /* stage('Generate JaCoCo Coverage Report') {
+        stage('Generate JaCoCo Coverage Report') {
             steps {
                 sh 'mvn jacoco:report'
             }
@@ -49,11 +49,11 @@ pipeline {
         stage('JaCoCo Coverage Report') {
             steps {
                 step([$class: 'JacocoPublisher',
-          */            //execPattern: '**/target/jacoco.exec',
-            //          classPattern: '**/classes',
-              //        sourcePattern: '**/src',
-                //      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
-             /*   ])  
+                     execPattern: '**/target/jacoco.exec',
+                     classPattern: '**/classes',
+                      sourcePattern: '**/src',
+                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
+               ])  
             }
         }*/
         stage('SonarQube Analysis') {
@@ -68,7 +68,7 @@ pipeline {
                 }
             }
         }
-/*
+
         stage('Security Vulnerability Scan - Dependency Check') {
             steps {
                 sh ''' 
@@ -92,13 +92,13 @@ pipeline {
         stage('Publish OWASP Dependency-Check Report') {
             steps {
                 step([$class: 'DependencyCheckPublisher',
-                     */// pattern: '**/dependency-check-report.html',
-                      /*healthy: '0',
+                      pattern: '**/dependency-check-report.html',
+                      healthy: '0',
                       unhealthy: '1',
                       failureThreshold: '1'
                 ])
             }
-        }*/
+        }
 
         stage('Build Docker Image') {
             steps {
