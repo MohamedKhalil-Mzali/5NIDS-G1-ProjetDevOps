@@ -269,12 +269,11 @@ stage('Make Script Executable') {
 stage('Publish Falco Report') {
     steps {
         publishHTML([ 
-            reportName: 'Falco Log',
-            reportDir: '/var/tmp',  // Use the correct path to where the report was generated
-            reportFiles: 'falco_logs/falco.html',  // The specific file created by Falco
-            alwaysLinkToLastBuild: true,  // Optionally link to the last build for easy navigation
-            allowMissing: false  // Ensure the report is present before attempting to publish
-        ])
+    reportName: 'Lynis Report', 
+    reportDir: '/tmp/lynis_reports', 
+    reportFiles: 'lynis-report.html', 
+    keepAll: true   // Add this parameter
+])
     }
 }
 
