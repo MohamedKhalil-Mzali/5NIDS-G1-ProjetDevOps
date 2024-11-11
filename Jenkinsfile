@@ -231,93 +231,93 @@ stage('Send Email Notification') {
                         body {
                             font-family: 'Poppins', sans-serif;
                             background-color: #101010;
-                            color: #e0e0e0;
+                            color: #ffffff;
                             margin: 0;
                             padding: 0;
                         }
                         .container {
-                            max-width: 850px;
-                            margin: 30px auto;
+                            max-width: 800px;
+                            margin: 20px auto;
                             padding: 30px;
-                            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+                            background: linear-gradient(145deg, #1a1a2e, #0f3460);
                             border-radius: 15px;
-                            box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.3), 0px 0px 30px rgba(0, 255, 255, 0.1);
-                            border: 1px solid #3d84a8;
+                            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
                         }
                         h2 {
                             color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
                             text-align: center;
-                            font-size: 28px;
+                            font-size: 30px;
                             margin-bottom: 20px;
-                            text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.6);
+                            text-shadow: 0 0 10px #00ff88, 0 0 20px ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};
+                        }
+                        p, th, td {
+                            font-size: 16px;
+                            line-height: 1.6;
                         }
                         .summary {
                             display: flex;
                             flex-direction: column;
-                            background-color: rgba(255, 255, 255, 0.05);
-                            padding: 20px;
-                            border-radius: 12px;
-                            border: 1px solid rgba(0, 229, 255, 0.4);
                             margin-top: 25px;
-                            animation: pulse 5s infinite;
+                            padding: 15px;
+                            background-color: rgba(255, 255, 255, 0.05);
+                            border-radius: 10px;
+                            border: 1px solid #3d84a8;
+                            box-shadow: 0 0 10px rgba(61, 132, 168, 0.5);
                         }
-                        .summary div {
-                            background: rgba(50, 50, 50, 0.8);
-                            padding: 12px;
+                        .summary-item {
+                            background-color: rgba(50, 50, 50, 0.8);
                             border-radius: 8px;
-                            margin: 10px 0;
+                            padding: 12px;
+                            margin-top: 10px;
                             font-size: 15px;
+                            opacity: 0;
+                            transform: translateX(-20px);
+                            animation: slideIn 0.6s forwards;
                         }
-                        @keyframes pulse {
-                            0%, 100% {
-                                box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
-                            }
-                            50% {
-                                box-shadow: 0 0 10px rgba(0, 255, 255, 0.4), 0 0 15px rgba(0, 229, 255, 0.2);
-                            }
-                        }
-                        .links {
-                            margin-top: 20px;
-                        }
-                        a {
-                            color: #3d84a8;
+                        .report-link {
+                            display: inline-block;
+                            padding: 10px 15px;
+                            border-radius: 6px;
+                            background-color: #3d84a8;
+                            color: #ffffff;
                             text-decoration: none;
                             font-weight: bold;
+                            transition: background-color 0.3s;
+                            margin-top: 10px;
                         }
-                        a:hover {
-                            text-decoration: underline;
+                        .report-link:hover {
+                            background-color: #00bfff;
                         }
                         .footer {
-                            text-align: center;
-                            margin-top: 40px;
                             font-size: 13px;
                             color: #aaaaaa;
+                            text-align: center;
+                            margin-top: 30px;
                         }
-                        .glow {
-                            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 229, 255, 0.5);
+                        @keyframes slideIn {
+                            to {
+                                opacity: 1;
+                                transform: translateX(0);
+                            }
                         }
                     </style>
                 </head>
                 <body>
                     <div class="container">
-                        <h2 class="glow">${subject}</h2>
+                        <h2>${subject}</h2>
                         <p>Hello Team,</p>
-                        <p>The Jenkins build for <strong>${env.JOB_NAME}</strong> has completed. Here is the overview:</p>
+                        <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed. Here is the overview:</p>
                         <div class="summary">
-                            <div>🔹 <strong>Build Number:</strong> ${currentBuild.number}</div>
-                            <div>🔹 <strong>Project:</strong> ${env.JOB_NAME}</div>
-                            <div>🔹 <strong>Build Duration:</strong> ${currentBuild.durationString}</div>
-                            <div>🔹 <strong>Result:</strong> <span style="color:${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};">${currentBuild.currentResult}</span></div>
+                            <div class="summary-item">🔹 <strong>Build Number:</strong> ${currentBuild.number}</div>
+                            <div class="summary-item">🔹 <strong>Project:</strong> ${env.JOB_NAME}</div>
+                            <div class="summary-item">🔹 <strong>Build Duration:</strong> ${currentBuild.durationString}</div>
+                            <div class="summary-item">🔹 <strong>Result:</strong> <span style="color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff88' : '#ff0044'};">${currentBuild.currentResult}</span></div>
                         </div>
 
-                        <div class="links">
-                            <p>🔗 <strong>Access Reports:</strong></p>
-                            <ul>
-                                <li><a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html">📊 JaCoCo Coverage Report</a></li>
-                                <li><a href="${env.BUILD_URL}artifact/dependency-check-report.html">⚠️ OWASP Dependency-Check Report</a></li>
-                                <li><a href="${env.BUILD_URL}artifact/tmp/lynis_reports/lynis-report.html">🛡️ Lynis Security Report</a></li>
-                            </ul>
-                        </div>
+                        <p>Access Reports:</p>
+                        <a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="report-link">📊 JaCoCo Coverage Report</a><br>
+                        <a href="${env.BUILD_URL}artifact/dependency-check-report.html" class="report-link">⚠️ OWASP Dependency-Check Report</a><br>
+                        <a href="${env.BUILD_URL}artifact/tmp/lynis_reports/lynis-report.html" class="report-link">🛡️ Lynis Security Report</a><br>
 
                         <div class="footer">
                             <p>Generated by Jenkins CI/CD Pipeline, Team DevOps</p>
@@ -337,6 +337,7 @@ stage('Send Email Notification') {
         }
     }
 }
+
 
     }
 }
