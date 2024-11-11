@@ -48,14 +48,14 @@ pipeline {
                 }
             }
         }
-
+/*
         stage('Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository, skipping tests
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
         }
-
+*/
         stage('Building image') {
             steps {
                 // Login to Docker Hub and build Docker image
