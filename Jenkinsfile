@@ -214,7 +214,7 @@ pipeline {
                 }
             }
         }
-        stage('Send Email Notification') {
+stage('Send Email Notification') {
     steps {
         script {
             // Determine the subject based on build result
@@ -227,94 +227,82 @@ pipeline {
                 <html>
                 <head>
                     <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+                        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
                         body {
-                            font-family: 'Orbitron', sans-serif;
-                            background-color: #0d0d0d;
-                            color: #e0e0e0;
+                            font-family: 'Poppins', sans-serif;
+                            background-color: #121212;
+                            color: #ffffff;
                             margin: 0;
                             padding: 0;
                         }
                         .container {
                             max-width: 800px;
                             margin: 20px auto;
-                            padding: 20px;
-                            background-color: #1e1e1e;
-                            border-radius: 15px;
-                            box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.5);
-                            border: 1px solid #00ffff;
+                            padding: 30px;
+                            background-color: #1f1f1f;
+                            border-radius: 12px;
+                            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+                            border: 1px solid #00e5ff;
                         }
                         h2 {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff00' : '#ff3333'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff1744'};
                             text-align: center;
-                            font-size: 28px;
+                            font-size: 26px;
+                            margin-bottom: 20px;
                         }
                         p, th, td {
-                            font-size: 15px;
+                            font-size: 16px;
                             line-height: 1.6;
                         }
                         table {
                             width: 100%;
                             border-spacing: 0;
                             border-collapse: collapse;
-                            margin-top: 15px;
-                            background-color: #292929;
+                            margin-top: 20px;
+                            background-color: #2c2c2c;
                         }
                         th, td {
-                            padding: 12px;
+                            padding: 14px;
                             border: 1px solid #444;
                         }
                         th {
                             background-color: #333;
-                            color: #00ffff;
+                            color: #00e5ff;
                             font-weight: bold;
                         }
                         .status {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff00' : '#ff3333'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff1744'};
                         }
                         .footer {
-                            font-size: 12px;
+                            font-size: 13px;
                             color: #aaa;
                             text-align: center;
-                            margin-top: 20px;
+                            margin-top: 30px;
                         }
                         .report-link {
-                            color: #00ffff;
+                            color: #00e5ff;
                             text-decoration: none;
                         }
                         .report-link:hover {
                             text-decoration: underline;
                         }
-                        .stage-status {
-                            display: inline-block;
-                            padding: 6px 12px;
-                            border-radius: 4px;
-                            color: #fff;
-                            font-weight: bold;
-                        }
-                        .stage-success {
-                            background-color: #00ff00;
-                        }
-                        .stage-failure {
-                            background-color: #ff3333;
-                        }
                         .summary {
                             display: flex;
                             flex-direction: column;
-                            margin-top: 20px;
-                            border: 1px dashed #00ffff;
+                            margin-top: 25px;
+                            border: 1px dashed #00e5ff;
                             padding: 15px;
                             border-radius: 8px;
                         }
                         .summary div {
                             background-color: #333;
                             border-radius: 8px;
-                            padding: 10px;
-                            margin-top: 8px;
-                            font-size: 14px;
+                            padding: 12px;
+                            margin-top: 10px;
+                            font-size: 15px;
                         }
                         .glow {
-                            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+                            text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff, 0 0 30px #00e5ff;
                         }
                     </style>
                 </head>
@@ -354,7 +342,6 @@ pipeline {
                      to: 'rayenbal55@gmail.com'
         }
     }
-        }
- 
+} 
     }
 }
