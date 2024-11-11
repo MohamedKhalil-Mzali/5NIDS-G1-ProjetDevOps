@@ -92,7 +92,7 @@ pipeline {
         stage('Publish OWASP Dependency-Check Report') {
             steps {
                 step([$class: 'DependencyCheckPublisher',
-                      pattern: '/dependency-check-report.html',
+                      pattern: '**/dependency-check-report.html',
                       healthy: '0',
                       unhealthy: '1',
                       failureThreshold: '1'
