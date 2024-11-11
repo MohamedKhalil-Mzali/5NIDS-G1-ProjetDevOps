@@ -49,11 +49,11 @@ pipeline {
         stage('JaCoCo Coverage Report') {
             steps {
                 step([$class: 'JacocoPublisher',
-                      execPattern: '**/target/jacoco.exec',
-                      classPattern: '**/classes',
-                      sourcePattern: '**/src',
-                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
-                ])  
+          */            //execPattern: '**/target/jacoco.exec',
+            //          classPattern: '**/classes',
+              //        sourcePattern: '**/src',
+                //      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
+             /*   ])  
             }
         }*/
         stage('SonarQube Analysis') {
@@ -92,8 +92,8 @@ pipeline {
         stage('Publish OWASP Dependency-Check Report') {
             steps {
                 step([$class: 'DependencyCheckPublisher',
-                      pattern: '**/dependency-check-report.html',
-                      healthy: '0',
+                     */// pattern: '**/dependency-check-report.html',
+                      /*healthy: '0',
                       unhealthy: '1',
                       failureThreshold: '1'
                 ])
