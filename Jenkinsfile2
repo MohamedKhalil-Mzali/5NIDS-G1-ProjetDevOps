@@ -68,7 +68,7 @@ pipeline {
             }
         } */
 
-     /*   stage('Building image') {
+        stage('Building image') {
             steps {
                 // Login to Docker Hub and build Docker image
                 withCredentials([string(credentialsId: 'dockerhub.jenkins.token', variable: 'dockerhub_token')]) {
@@ -76,7 +76,7 @@ pipeline {
                 }
                 sh 'docker build -t wajdibenromdhane/gestion-station-ski:1.0.0 .'
             }
-        } */
+        } 
 
       stage('Security Scan with Trivy') {
             steps {
