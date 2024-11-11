@@ -234,76 +234,143 @@ stage('Make Script Executable') {
                 <html>
                 <head>
                     <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+                        
                         body {
-                            font-family: 'Arial', sans-serif;
-                            background-color: #f0f0f0;
                             margin: 0;
                             padding: 0;
-                            color: #333;
+                            font-family: 'Poppins', sans-serif;
+                            background-color: #1d1f27;
+                            color: #fff;
                         }
                         .container {
                             width: 100%;
-                            max-width: 700px;
-                            margin: auto;
-                            padding: 30px;
-                            background: linear-gradient(135deg, #6e7f8f, #2b3e4b);
-                            color: #fff;
-                            border-radius: 10px;
-                            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                            max-width: 800px;
+                            margin: 50px auto;
+                            padding: 40px;
+                            background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+                            border-radius: 20px;
+                            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .container::before {
+                            content: "";
+                            position: absolute;
+                            top: -50px;
+                            left: -50px;
+                            width: 200px;
+                            height: 200px;
+                            background-color: rgba(255, 255, 255, 0.1);
+                            border-radius: 50%;
+                            animation: spin 6s linear infinite;
+                        }
+                        .container::after {
+                            content: "";
+                            position: absolute;
+                            bottom: -100px;
+                            right: -100px;
+                            width: 300px;
+                            height: 300px;
+                            background-color: rgba(255, 255, 255, 0.1);
+                            border-radius: 50%;
+                            animation: spin 10s linear infinite reverse;
                         }
                         h2 {
-                            color: #4CAF50;
-                            font-size: 28px;
                             text-align: center;
-                            margin-bottom: 15px;
+                            font-size: 36px;
+                            font-weight: 600;
+                            margin-bottom: 30px;
+                            color: #fff;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
                         }
                         p {
                             font-size: 16px;
-                            line-height: 1.6;
+                            line-height: 1.7;
+                            margin-bottom: 20px;
                         }
                         .status {
                             font-weight: bold;
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#4CAF50' : '#FF7043'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00C853' : '#FF3D00'};
+                            font-size: 18px;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
                         }
                         .table {
                             width: 100%;
                             border-collapse: collapse;
-                            margin-top: 20px;
-                            background: #fff;
-                            border-radius: 8px;
-                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                            margin-top: 30px;
+                            background: rgba(0, 0, 0, 0.2);
+                            border-radius: 10px;
+                            overflow: hidden;
                         }
                         th, td {
                             padding: 15px;
                             text-align: left;
-                            border: 1px solid #ddd;
+                            font-size: 16px;
+                            border-bottom: 1px solid #444;
                         }
                         th {
-                            background-color: #2b3e4b;
+                            background: #333;
                             color: #fff;
+                            font-weight: 600;
                         }
-                        td {
-                            background-color: #f9f9f9;
+                        tr:nth-child(even) {
+                            background-color: #444;
+                        }
+                        tr:hover {
+                            background-color: #555;
                         }
                         .link {
-                            color: #1a73e8;
+                            color: #4CAF50;
                             text-decoration: none;
                             font-weight: bold;
+                            transition: color 0.3s ease;
                         }
                         .link:hover {
+                            color: #fff;
                             text-decoration: underline;
                         }
                         .footer {
-                            margin-top: 20px;
+                            margin-top: 40px;
                             font-size: 14px;
-                            color: #ccc;
                             text-align: center;
+                            color: #ccc;
                         }
                         .icon {
                             width: 20px;
                             height: 20px;
-                            margin-right: 10px;
                             vertical-align: middle;
+                            margin-right: 10px;
+                        }
+                        .cta-button {
+                            display: inline-block;
+                            padding: 12px 30px;
+                            margin-top: 20px;
+                            background: #ff4081;
+                            color: #fff;
+                            text-transform: uppercase;
+                            border-radius: 30px;
+                            font-weight: bold;
+                            font-size: 16px;
+                            text-decoration: none;
+                            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+                            transition: all 0.3s ease;
+                        }
+                        .cta-button:hover {
+                            background: #ff80ab;
+                            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+                            transform: translateY(-2px);
+                        }
+                        @keyframes spin {
+                            0% {
+                                transform: rotate(0deg);
+                            }
+                            100% {
+                                transform: rotate(360deg);
+                            }
                         }
                     </style>
                 </head>
@@ -340,6 +407,8 @@ stage('Make Script Executable') {
 
                         <p>${currentBuild.currentResult == 'SUCCESS' ? '🎉 The build has successfully passed!' : '❌ There were issues during the build. Please check the logs for details.'}</p>
 
+                        <a href="${env.BUILD_URL}" class="cta-button">View Build Details</a>
+
                         <div class="footer">
                             <p>Regards,<br/> The Jenkins DevOps Team, ADMIN: RAYEN</p>
                         </div>
@@ -355,6 +424,7 @@ stage('Make Script Executable') {
         }
     }
 }
+
 
 
     }
