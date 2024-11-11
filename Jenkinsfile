@@ -214,8 +214,7 @@ pipeline {
                 }
             }
         }
-        
-               stage('Send Email Notification') {
+        stage('Send Email Notification') {
     steps {
         script {
             // Determine the subject based on build result
@@ -228,46 +227,50 @@ pipeline {
                 <html>
                 <head>
                     <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
                         body {
-                            font-family: 'Roboto', sans-serif;
-                            background-color: #1d1f21;
+                            font-family: 'Orbitron', sans-serif;
+                            background-color: #0d0d0d;
                             color: #e0e0e0;
+                            margin: 0;
+                            padding: 0;
                         }
                         .container {
-                            max-width: 700px;
-                            margin: auto;
+                            max-width: 800px;
+                            margin: 20px auto;
                             padding: 20px;
-                            background-color: #2a2e33;
-                            border-radius: 12px;
-                            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
-                            font-family: 'Roboto', sans-serif;
+                            background-color: #1e1e1e;
+                            border-radius: 15px;
+                            box-shadow: 0px 0px 20px rgba(0, 255, 255, 0.5);
+                            border: 1px solid #00ffff;
                         }
                         h2 {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#81C784' : '#FF7043'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff00' : '#ff3333'};
                             text-align: center;
-                            font-size: 24px;
+                            font-size: 28px;
                         }
                         p, th, td {
                             font-size: 15px;
+                            line-height: 1.6;
                         }
                         table {
                             width: 100%;
                             border-spacing: 0;
                             border-collapse: collapse;
                             margin-top: 15px;
-                            background-color: #33363b;
+                            background-color: #292929;
                         }
                         th, td {
                             padding: 12px;
                             border: 1px solid #444;
                         }
                         th {
-                            background-color: #42474d;
-                            color: #e0e0e0;
+                            background-color: #333;
+                            color: #00ffff;
                             font-weight: bold;
                         }
                         .status {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#81C784' : '#FF7043'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#00ff00' : '#ff3333'};
                         }
                         .footer {
                             font-size: 12px;
@@ -276,7 +279,7 @@ pipeline {
                             margin-top: 20px;
                         }
                         .report-link {
-                            color: #64b5f6;
+                            color: #00ffff;
                             text-decoration: none;
                         }
                         .report-link:hover {
@@ -290,28 +293,34 @@ pipeline {
                             font-weight: bold;
                         }
                         .stage-success {
-                            background-color: #66bb6a;
+                            background-color: #00ff00;
                         }
                         .stage-failure {
-                            background-color: #e57373;
+                            background-color: #ff3333;
                         }
                         .summary {
                             display: flex;
                             flex-direction: column;
                             margin-top: 20px;
+                            border: 1px dashed #00ffff;
+                            padding: 15px;
+                            border-radius: 8px;
                         }
                         .summary div {
-                            background-color: #42474d;
+                            background-color: #333;
                             border-radius: 8px;
                             padding: 10px;
                             margin-top: 8px;
                             font-size: 14px;
                         }
+                        .glow {
+                            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+                        }
                     </style>
                 </head>
                 <body>
                     <div class="container">
-                        <h2>${subject}</h2>
+                        <h2 class="glow">${subject}</h2>
                         <p>Hello Team,</p>
                         <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed. Here is the summary:</p>
                         <div class="summary">
@@ -345,7 +354,7 @@ pipeline {
                      to: 'rayenbal55@gmail.com'
         }
     }
-}
+        }
  
     }
 }
