@@ -250,9 +250,27 @@ stage('Make Script Executable') {
     stage('Continuous Scanning and Monitoring') {
     steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            // Run Falco in a privileged container with necessary mounts
             sh '''
-           sudo docker run --rm --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock falcosecurity/falco:latest
+                # Ensure that falco.yaml is present and valid
+                if [ ! -f /etc/falco/falco.yaml ]; then
+                    echo "falco.yaml not found, downloading default config."
+                    sudo wget -O /etc/falco/falco.yaml https://raw.githubusercontent.com/falcosecurity/falco/master/falco.yaml
+                fi
+                
+                # Create log directory with proper permissions
+                sudo mkdir -p /var/tmp/falco_logs
+                sudo chown -R jenkins:jenkins /var/tmp/falco_logs
+                sudo chmod 777 /var/tmp/falco_logs
+
+                # Run Falco in a privileged Docker container with necessary mounts
+                sudo docker run --rm --privileged \
+                    -v /host:/host \
+                    -v /proc:/host/proc:ro \
+                    -v /sys:/host/sys:ro \
+                    -v /var/run/docker.sock:/var/run/docker.sock \
+                    -v /etc/falco:/etc/falco \
+                    -v /var/tmp/falco_logs:/output \
+                    falcosecurity/falco:latest -c /etc/falco/falco.yaml
             '''
         }
     }
@@ -263,7 +281,7 @@ stage('Make Script Executable') {
     }
 }
 
-/* stage('Publish Falco Report') {
+stage('Publish Falco Report') {
     steps {
         publishHTML([
             reportName: 'Falco Monitoring Log',
@@ -274,7 +292,7 @@ stage('Make Script Executable') {
             alwaysLinkToLastBuild: true
         ])
     }
-}*/
+}
 
 
 
