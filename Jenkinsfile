@@ -193,6 +193,7 @@ pipeline {
                         sudo mkdir -p /tmp/lynis_reports
                         sudo lynis audit system --quick --report-file /tmp/lynis_reports/lynis-report.dat
                         sudo cp /tmp/lynis_reports/lynis-report.dat /tmp/lynis_reports/lynis-report.html
+                        sudo chmod -R 777 /tmp/lynis_reports/
                         sudo sed -i '1s/^/<html><body><pre>/' /tmp/lynis_reports/lynis-report.html
                         echo "</pre></body></html>" >> /tmp/lynis_reports/lynis-report.html
                     '''
@@ -214,119 +215,139 @@ pipeline {
             }
         }
         
-                stage('Send Email Notification') {
+               stage('Send Email Notification') {
     steps {
         script {
             def subject = currentBuild.currentResult == 'SUCCESS' ?
-                "🌟 Build Success: ${currentBuild.fullDisplayName}" :
-                "🚨 Build Failure: ${currentBuild.fullDisplayName}";
-
-            def duration = currentBuild.durationString.replace(' and counting', '') // Get build duration
-            def stagesDetails = ''
-            def summaryDetails = ''
-
-            // Collect stage details
-            currentBuild.rawBuild.getExecution().getStages().each { stage ->
-                def status = stage.getStatus().toString()
-                def stageDuration = stage.getDurationString().replace(' and counting', '')
-                stagesDetails += "<tr><td>${stage.getName()}</td><td>${status}</td><td>${stageDuration}</td></tr>"
-            }
-
-            // Overall build status summary
-            summaryDetails = """
-                <tr><td><strong>Build Number</strong></td><td>${currentBuild.number}</td></tr>
-                <tr><td><strong>Project</strong></td><td>${env.JOB_NAME}</td></tr>
-                <tr><td><strong>Build URL</strong></td><td><a href="${env.BUILD_URL}" class="report-link">View Build Details</a></td></tr>
-                <tr><td><strong>Overall Result</strong></td><td class="status">${currentBuild.currentResult}</td></tr>
-                <tr><td><strong>Total Build Time</strong></td><td>${duration}</td></tr>
-            """
+                "✨ Build Success: ${currentBuild.fullDisplayName}" :
+                "❗ Build Failure: ${currentBuild.fullDisplayName}";
 
             def body = """
                 <html>
                 <head>
                     <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
                         body {
                             font-family: 'Roboto', sans-serif;
-                            background-color: #121212;
+                            background-color: #1d1f21;
                             color: #e0e0e0;
                         }
                         .container {
-                            width: 80%;
-                            max-width: 600px;
-                            margin: 20px auto;
-                            padding: 30px;
-                            background: linear-gradient(135deg, #3a3f47, #212121);
+                            max-width: 700px;
+                            margin: auto;
+                            padding: 20px;
+                            background-color: #2a2e33;
                             border-radius: 12px;
-                            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+                            font-family: 'Roboto', sans-serif;
                         }
                         h2 {
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff3d00'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#81C784' : '#FF7043'};
                             text-align: center;
-                            text-transform: uppercase;
                             font-size: 24px;
-                            letter-spacing: 1px;
                         }
-                        p {
-                            font-size: 16px;
-                            line-height: 1.6;
-                            color: #bdbdbd;
+                        p, th, td {
+                            font-size: 15px;
                         }
                         table {
                             width: 100%;
-                            margin-top: 20px;
+                            border-spacing: 0;
                             border-collapse: collapse;
-                            color: #bdbdbd;
+                            margin-top: 15px;
+                            background-color: #33363b;
                         }
                         th, td {
                             padding: 12px;
-                            border-bottom: 1px solid #484848;
+                            border: 1px solid #444;
                         }
                         th {
-                            background-color: #333333;
-                            text-transform: uppercase;
+                            background-color: #42474d;
+                            color: #e0e0e0;
+                            font-weight: bold;
                         }
                         .status {
-                            font-weight: bold;
-                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff3d00'};
+                            color: ${currentBuild.currentResult == 'SUCCESS' ? '#81C784' : '#FF7043'};
+                        }
+                        .footer {
+                            font-size: 12px;
+                            color: #aaa;
+                            text-align: center;
+                            margin-top: 20px;
                         }
                         .report-link {
-                            color: #03a9f4;
+                            color: #64b5f6;
                             text-decoration: none;
                         }
                         .report-link:hover {
                             text-decoration: underline;
                         }
-                        .footer {
+                        .stage-status {
+                            display: inline-block;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            color: #fff;
+                            font-weight: bold;
+                        }
+                        .stage-success {
+                            background-color: #66bb6a;
+                        }
+                        .stage-failure {
+                            background-color: #e57373;
+                        }
+                        .summary {
+                            display: flex;
+                            flex-direction: column;
                             margin-top: 20px;
-                            text-align: center;
+                        }
+                        .summary div {
+                            background-color: #42474d;
+                            border-radius: 8px;
+                            padding: 10px;
+                            margin-top: 8px;
                             font-size: 14px;
-                            color: #9e9e9e;
                         }
                     </style>
                 </head>
                 <body>
                     <div class="container">
-                        <h2>🚀 Build Status Notification</h2>
-                        <p>Dear Team,</p>
-                        <p>The Jenkins build for <strong>${env.JOB_NAME}</strong> has completed. Below are the detailed results:</p>
+                        <h2>${subject}</h2>
+                        <p>Hello Team,</p>
+                        <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed. Here is the summary:</p>
+                        <div class="summary">
+                            <div>🔹 <strong>Build Number:</strong> ${currentBuild.number}</div>
+                            <div>🔹 <strong>Project:</strong> ${env.JOB_NAME}</div>
+                            <div>🔹 <strong>Build Duration:</strong> ${currentBuild.durationString}</div>
+                            <div>🔹 <strong>Result:</strong> <span class="status">${currentBuild.currentResult}</span></div>
+                        </div>
+
                         <table>
-                            ${summaryDetails}
+                            <thead>
+                                <tr>
+                                    <th>Stage</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% currentBuild.buildCauses.each { cause -> %>
+                                    <tr>
+                                        <td>${cause.shortDescription}</td>
+                                        <td class="stage-status <%= cause.result == 'SUCCESS' ? 'stage-success' : 'stage-failure' %>">${cause.result}</td>
+                                        <td>${cause.durationString}</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
                         </table>
-                        <h3>Stage-wise Status & Duration</h3>
-                        <table>
-                            <tr><th>Stage</th><th>Status</th><th>Duration</th></tr>
-                            ${stagesDetails}
-                        </table>
-                        <p>Access the full reports:</p>
+
+                        <p>Access the reports:</p>
                         <ul>
                             <li><a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="report-link">📊 JaCoCo Coverage Report</a></li>
-                            <li><a href="/tmp/lynis_reports/lynis-report.html" class="report-link">🛡️ Lynis Security Report</a></li>
-                            <li><a href="${env.BUILD_URL}artifact/dependency-check-report.html" class="report-link">🔒 OWASP Dependency-Check Report</a></li>
+                            <li><a href="${env.BUILD_URL}artifact/dependency-check-report.html" class="report-link">⚠️ OWASP Dependency-Check Report</a></li>
+                            <li><a href="${env.BUILD_URL}artifact/tmp/lynis_reports/lynis-report.html" class="report-link">🛡️ Lynis Security Report</a></li>
                         </ul>
-                        <p>${currentBuild.currentResult == 'SUCCESS' ? '🎉 Congratulations! The build succeeded without any issues.' : '❌ The build encountered issues. Please check the reports for further details.'}</p>
+
                         <div class="footer">
-                            <p>Kind regards,<br/>The Jenkins DevOps Team</p>
+                            <p>Generated by Jenkins CI/CD Pipeline, Team DevOps</p>
+                            <p>Admin: Rayen</p>
                         </div>
                     </div>
                 </body>
@@ -336,9 +357,12 @@ pipeline {
             emailext subject: subject,
                       body: body,
                       mimeType: 'text/html',
+                      attachmentsPattern: 'target/site/jacoco/*.html, dependency-check-report.html, tmp/lynis_reports/lynis-report.html',
                       to: 'rayenbal55@gmail.com'
         }
     }
-                }
+}
+
+
     }
 }
