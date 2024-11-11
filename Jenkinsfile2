@@ -49,14 +49,26 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nexus') {
+        stage('System Security Check - Lynis') {
+            steps {
+                script {
+                    // Exécution de l'audit de sécurité système avec Lynis
+                    sh 'lynis audit system | tee lynis_audit_output.txt'
+                    
+                    // Archivage des résultats pour consultation ultérieure
+                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
+   /*     stage('Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository, skipping tests
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
-        }
+        } */
 
-        stage('Building image') {
+     /*   stage('Building image') {
             steps {
                 // Login to Docker Hub and build Docker image
                 withCredentials([string(credentialsId: 'dockerhub.jenkins.token', variable: 'dockerhub_token')]) {
@@ -64,7 +76,7 @@ pipeline {
                 }
                 sh 'docker build -t wajdibenromdhane/gestion-station-ski:1.0.0 .'
             }
-        }
+        } */
 
       stage('Security Scan with Trivy') {
             steps {
