@@ -222,13 +222,14 @@ pipeline {
     steps {
         script {
             // Use withCredentials block to securely inject credentials
-            withCredentials([usernamePassword(credentialsId: 'TWILIO_ACCOUNT_SID', usernameVariable: 'TWILIO_ACCOUNT_SID', passwordVariable: 'TWILIO_AUTH_TOKEN')]) {
+            withCredentials([string(credentialsId: 'TWILIO_ACCOUNT_SID', variable: 'TWILIO_ACCOUNT_SID'),
+                             string(credentialsId: 'TWILIO_AUTH_TOKEN', variable: 'TWILIO_AUTH_TOKEN')]) {
                 def message = currentBuild.currentResult == 'SUCCESS' ?
                     "✅ Build Success: ${currentBuild.fullDisplayName}" :
                     "❌ Build Failure: ${currentBuild.fullDisplayName}"
 
                 // Send WhatsApp message using Twilio API with curl
-                sh '''
+                sh ''' 
                 curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" \
                     --data-urlencode "To=whatsapp:+21628221389" \
                     --data-urlencode "From=whatsapp:+12629474415" \
@@ -239,6 +240,8 @@ pipeline {
         }
     }
 }
+
+
 
 
 
