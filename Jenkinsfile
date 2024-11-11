@@ -272,8 +272,11 @@ stage('Publish Falco Report') {
     reportName: 'Falco Monitoring Log', 
     reportDir: '/tmp/falco_logs', 
     reportFiles: 'falco.html', 
-    keepAll: true   // Add this parameter to keep all reports
+    keepAll: true,   // Keeps all reports
+    allowMissing: false,  // Set to false to fail the build if the report is missing
+    alwaysLinkToLastBuild: true  // Link the report to the last build
 ])
+
     }
 }
 
