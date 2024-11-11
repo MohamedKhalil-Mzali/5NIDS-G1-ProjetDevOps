@@ -218,12 +218,7 @@ stage('Make Script Executable') {
     }
 }
         
-
-     
-
-
-
-        stage('Send Email Notification') {
+stage('Send Email Notification') {
     steps {
         script {
             def subject = currentBuild.currentResult == 'SUCCESS' ? 
@@ -254,28 +249,6 @@ stage('Make Script Executable') {
                             position: relative;
                             overflow: hidden;
                         }
-                        .container::before {
-                            content: "";
-                            position: absolute;
-                            top: -50px;
-                            left: -50px;
-                            width: 200px;
-                            height: 200px;
-                            background-color: rgba(255, 255, 255, 0.1);
-                            border-radius: 50%;
-                            animation: spin 6s linear infinite;
-                        }
-                        .container::after {
-                            content: "";
-                            position: absolute;
-                            bottom: -100px;
-                            right: -100px;
-                            width: 300px;
-                            height: 300px;
-                            background-color: rgba(255, 255, 255, 0.1);
-                            border-radius: 50%;
-                            animation: spin 10s linear infinite reverse;
-                        }
                         h2 {
                             text-align: center;
                             font-size: 36px;
@@ -298,79 +271,11 @@ stage('Make Script Executable') {
                             text-transform: uppercase;
                             letter-spacing: 1px;
                         }
-                        .table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 30px;
-                            background: rgba(0, 0, 0, 0.2);
-                            border-radius: 10px;
-                            overflow: hidden;
-                        }
-                        th, td {
-                            padding: 15px;
-                            text-align: left;
-                            font-size: 16px;
-                            border-bottom: 1px solid #444;
-                        }
-                        th {
-                            background: #333;
-                            color: #fff;
-                            font-weight: 600;
-                        }
-                        tr:nth-child(even) {
-                            background-color: #444;
-                        }
-                        tr:hover {
-                            background-color: #555;
-                        }
-                        .link {
-                            color: #4CAF50;
-                            text-decoration: none;
-                            font-weight: bold;
-                            transition: color 0.3s ease;
-                        }
-                        .link:hover {
-                            color: #fff;
-                            text-decoration: underline;
-                        }
                         .footer {
                             margin-top: 40px;
                             font-size: 14px;
                             text-align: center;
                             color: #ccc;
-                        }
-                        .icon {
-                            width: 20px;
-                            height: 20px;
-                            vertical-align: middle;
-                            margin-right: 10px;
-                        }
-                        .cta-button {
-                            display: inline-block;
-                            padding: 12px 30px;
-                            margin-top: 20px;
-                            background: #ff4081;
-                            color: #fff;
-                            text-transform: uppercase;
-                            border-radius: 30px;
-                            font-weight: bold;
-                            font-size: 16px;
-                            text-decoration: none;
-                            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-                            transition: all 0.3s ease;
-                        }
-                        .cta-button:hover {
-                            background: #ff80ab;
-                            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-                            transform: translateY(-2px);
-                        }
-                        @keyframes spin {
-                            0% {
-                                transform: rotate(0deg);
-                            }
-                            100% {
-                                transform: rotate(360deg);
-                            }
                         }
                     </style>
                 </head>
@@ -379,7 +284,7 @@ stage('Make Script Executable') {
                         <h2>🚀 Build Status Notification</h2>
                         <p>Hello Team,</p>
                         <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed.</p>
-                        <table class="table">
+                        <table>
                             <tr>
                                 <th>Build Number</th>
                                 <td>${currentBuild.number}</td>
@@ -400,14 +305,12 @@ stage('Make Script Executable') {
 
                         <p>Access the reports:</p>
                         <ul>
-                            <li><a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="link">📊 JaCoCo Coverage Report</a></li>
-                            <li><a href="/tmp/lynis_reports/lynis-report.html" class="link">🛡️ Lynis Security Report</a></li>
-                            <li><a href="${env.BUILD_URL}artifact/target/dependency-check-report.html" class="link">🔒 OWASP Dependency-Check Report</a></li>
+                            <li>📊 JaCoCo Coverage Report</li>
+                            <li>🛡️ Lynis Security Report</li>
+                            <li>🔒 OWASP Dependency-Check Report</li>
                         </ul>
 
                         <p>${currentBuild.currentResult == 'SUCCESS' ? '🎉 The build has successfully passed!' : '❌ There were issues during the build. Please check the logs for details.'}</p>
-
-                        <a href="${env.BUILD_URL}" class="cta-button">View Build Details</a>
 
                         <div class="footer">
                             <p>Regards,<br/> The Jenkins DevOps Team, ADMIN: RAYEN</p>
@@ -417,13 +320,22 @@ stage('Make Script Executable') {
                 </html>
             """
 
+            // Attach generated report files as artifacts from the workspace
+            def attachments = [
+                "${WORKSPACE}/target/site/jacoco/index.html",    // JaCoCo Report
+                "${WORKSPACE}/tmp/lynis_reports/lynis-report.html", // Lynis Report
+                "${WORKSPACE}/target/dependency-check-report.html" // OWASP Dependency-Check Report
+            ]
+
             emailext subject: subject,
                       body: body,
                       mimeType: 'text/html',
-                      to: 'rayenbal55@gmail.com'
+                      to: 'rayenbal55@gmail.com',
+                      attachFiles: attachments
         }
     }
 }
+
 
 
 
