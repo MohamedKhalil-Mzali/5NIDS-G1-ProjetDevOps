@@ -8,6 +8,9 @@ pipeline {
         DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
         DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'
         MY_SECRET_KEY = 'dummy_value_for_testing'
+       TWILIO_ACCOUNT_SID = credentials('twilio_account_sid')  
+    TWILIO_AUTH_TOKEN = credentials('twilio_auth_token')    
+
     }
     stages {
         stage('Git Checkout') {
@@ -216,21 +219,24 @@ pipeline {
         }
 
         stage('Send WhatsApp Notification') {
-            steps {
-                script {
-                    def message = currentBuild.currentResult == 'SUCCESS' ? 
-                        "✅ Build Success: ${currentBuild.fullDisplayName}" : 
-                        "❌ Build Failure: ${currentBuild.fullDisplayName}"
-
-                    // Send WhatsApp message using Twilio Notifier Plugin
-                    twilio (
-                        body: message,
-                        to: 'whatsapp:+21628221389',  // Recipient's phone number
-                        from: 'whatsapp:+21628221389' // Your Twilio phone number
-                    )
-                }
-            }
+    steps {
+        script {
+            // Determine the message based on build result
+            def message = currentBuild.currentResult == 'SUCCESS' ? 
+                          "✅ Build Success: ${currentBuild.fullDisplayName}" : 
+                          "❌ Build Failure: ${currentBuild.fullDisplayName}"
+            
+            // Send WhatsApp message using Twilio API with curl
+            sh '''curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" \
+                --data-urlencode "To=whatsapp:+21628221389" \
+                --data-urlencode "From=whatsapp:+12629474415" \
+                --data-urlencode "Body=${message}" \
+                -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}'''
         }
+    }
+}
+
+
 
 stage('Send Email Notification') {
     steps {
