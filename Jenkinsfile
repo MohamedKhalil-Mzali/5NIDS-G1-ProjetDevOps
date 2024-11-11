@@ -8,7 +8,7 @@ pipeline {
         DOCKER_COMPOSE_PATH = '/usr/local/bin/docker-compose'
         DEPENDENCY_CHECK_CACHE_DIR = '/var/jenkins_home/.m2/repository/org/owasp/dependency-check'
         MY_SECRET_KEY = 'dummy_value_for_testing'
-       TWILIO_ACCOUNT_SID = credentials('twilio_account_sid')  
+       TWILIO_ACCOUNT_SID = credentials('TWILIO_ACCOUNT_SID')  
     TWILIO_AUTH_TOKEN = credentials('TWILIO_AUTH_TOKEN')    
 
     }
