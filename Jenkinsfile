@@ -247,37 +247,37 @@ stage('Make Script Executable') {
     }
 }
 
-        stage('Continuous Scanning and Monitoring - Falco') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh '''
-                    sudo mkdir -p /tmp/falco_logs
-                    sudo docker run --privileged -v /proc:/host/proc:ro \
-                                    -v /boot:/host/boot:ro \
-                                    -v /lib/modules:/host/lib/modules:ro \
-                                    -v /usr:/host/usr:ro \
-                                    -v /etc:/host/etc:ro \
-                                    -v /var/run/docker.sock:/var/run/docker.sock \
-                                    -e FALCO_LOG_STDOUT=true \
-                                    falcosecurity/falco:latest > /tmp/falco_logs/falco.html &
-                    sleep 10
-                    sudo pkill falco
-                    sed -i '1s/^/<html><body><pre>/' /tmp/falco_logs/falco.html
-                    echo "</pre></body></html>" >> /tmp/falco_logs/falco.html
-                    '''
-                }
-            }
-            post {
-                always {
-                    publishHTML([allowMissing: true,
-                                 alwaysLinkToLastBuild: true,
-                                 keepAll: true,
-                                 reportDir: '/tmp/falco_logs',
-                                 reportFiles: 'falco.html',
-                                 reportName: 'Falco Monitoring Log'])
-                }
-            }
+       stage('Continuous Scanning and Monitoring - Falco') {
+    steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            // Ensure the directory exists and has proper permissions
+            sh '''
+                sudo mkdir -p /var/tmp/falco_logs  # Create directory if it doesn't exist
+                sudo chown jenkins:jenkins /var/tmp/falco_logs  # Ensure Jenkins user owns the directory
+                sudo chmod 777 /var/tmp/falco_logs  # Give write access to the Jenkins user for testing
+                falco -c /etc/falco/falco.yaml --output /var/tmp/falco_logs/falco.html  # Run Falco and output to HTML
+            '''
         }
+    }
+    post {
+        failure {
+            echo 'Falco monitoring encountered an error!'
+        }
+    }
+}
+
+stage('Publish Falco Report') {
+    steps {
+        publishHTML([ 
+            reportName: 'Falco Log',
+            reportDir: '/var/tmp',  // Use the correct path to where the report was generated
+            reportFiles: 'falco_logs/falco.html',  // The specific file created by Falco
+            alwaysLinkToLastBuild: true,  // Optionally link to the last build for easy navigation
+            allowMissing: false  // Ensure the report is present before attempting to publish
+        ])
+    }
+}
+
         stage('Send Email Notification') {
             steps {
                 script {
