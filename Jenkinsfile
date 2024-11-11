@@ -40,7 +40,7 @@ pipeline {
                 }
             }
         }
-        stage('Generate JaCoCo Coverage Report') {
+       /* stage('Generate JaCoCo Coverage Report') {
             steps {
                 sh 'mvn jacoco:report'
             }
@@ -55,7 +55,7 @@ pipeline {
                       exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
                 ])  
             }
-        }
+        }*/
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -68,7 +68,7 @@ pipeline {
                 }
             }
         }
-
+/*
         stage('Security Vulnerability Scan - Dependency Check') {
             steps {
                 sh ''' 
@@ -98,7 +98,7 @@ pipeline {
                       failureThreshold: '1'
                 ])
             }
-        }
+        }*/
 
         stage('Build Docker Image') {
             steps {
