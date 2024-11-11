@@ -55,7 +55,7 @@ pipeline {
                       exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
                ])  
             }
-        }*/
+        }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
