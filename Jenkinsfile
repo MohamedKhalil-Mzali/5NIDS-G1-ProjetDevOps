@@ -247,43 +247,12 @@ stage('Make Script Executable') {
     }
 }
 
-    stage('Continuous Scanning and Monitoring - Falco') {
+    stage('Continuous Scanning and Monitoring') {
     steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            // Run Falco in a privileged container with necessary mounts
             sh '''
-                # Pull and prepare Falco if necessary
-                sudo docker pull falcosecurity/falco:latest
-                
-                # Validate Falco configuration file, if it exists
-                        sudo docker run --rm --privileged \
-                        -v /host:/host \
-                        -v /proc:/host/proc \
-                        -v /sys:/host/sys \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v /etc/falco:/etc/falco \
-                        falcosecurity/falco:latest \
-        
-                
-
-                # Ensure log directory exists with correct permissions
-                sudo mkdir -p /var/tmp/falco_logs
-                sudo chown -R jenkins:jenkins /var/tmp/falco_logs
-                sudo chmod 777 /var/tmp/falco_logs
-
-                # Run Falco with output directed to log file
-                sudo docker run --rm --privileged \
-                    -v /proc:/host/proc:ro \
-                    -v /boot:/host/boot:ro \
-                    -v /lib/modules:/host/lib/modules:ro \
-                    -v /usr:/host/usr:ro \
-                    -v /etc/falco:/etc/falco \
-                    -v /var/tmp/falco_logs:/output \
-                    falcosecurity/falco:latest -c /etc/falco/falco.yaml > /var/tmp/falco_logs/falco.log
-
-                # Wrap output log in HTML for display
-                sudo bash -c 'echo "<html><body><pre>" > /var/tmp/falco_logs/falco.html'
-                sudo cat /var/tmp/falco_logs/falco.log >> /var/tmp/falco_logs/falco.html
-                sudo bash -c 'echo "</pre></body></html>" >> /var/tmp/falco_logs/falco.html'
+           sudo docker run --privileged -v /host:/host -v /proc:/host/proc -v /sys:/host/sys -v /var/run/docker.sock:/var/run/docker.sock -v /etc/falco:/etc/falco --entrypoint cat falcosecurity/falco:latest /etc/falco/falco.yaml
             '''
         }
     }
@@ -294,7 +263,7 @@ stage('Make Script Executable') {
     }
 }
 
-stage('Publish Falco Report') {
+/* stage('Publish Falco Report') {
     steps {
         publishHTML([
             reportName: 'Falco Monitoring Log',
@@ -305,7 +274,7 @@ stage('Publish Falco Report') {
             alwaysLinkToLastBuild: true
         ])
     }
-}
+}*/
 
 
 
