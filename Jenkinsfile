@@ -193,7 +193,7 @@ pipeline {
                         sudo mkdir -p /tmp/lynis_reports
                         sudo lynis audit system --quick --report-file /tmp/lynis_reports/lynis-report.dat
                         sudo cp /tmp/lynis_reports/lynis-report.dat /tmp/lynis_reports/lynis-report.html
-                        sed -i '1s/^/<html><body><pre>/' /tmp/lynis_reports/lynis-report.html
+                        sudo sed -i '1s/^/<html><body><pre>/' /tmp/lynis_reports/lynis-report.html
                         echo "</pre></body></html>" >> /tmp/lynis_reports/lynis-report.html
                     '''
                 }
@@ -214,7 +214,7 @@ pipeline {
             }
         }
         
-        stage('Send Email Notification') {
+                stage('Send Email Notification') {
             steps {
                 script {
                     def subject = currentBuild.currentResult == 'SUCCESS' ?
@@ -225,64 +225,74 @@ pipeline {
                         <html>
                         <head>
                             <style>
+                                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
                                 body {
-                                    font-family: 'Arial', sans-serif;
-                                    background-color: #f0f0f0;
-                                    color: #333;
+                                    font-family: 'Roboto', sans-serif;
+                                    background-color: #121212;
+                                    color: #e0e0e0;
                                 }
                                 .container {
+                                    width: 80%;
                                     max-width: 600px;
-                                    margin: auto;
-                                    padding: 20px;
-                                    background-color: #fff;
-                                    border-radius: 8px;
-                                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                                    margin: 20px auto;
+                                    padding: 30px;
+                                    background: linear-gradient(135deg, #3a3f47, #212121);
+                                    border-radius: 12px;
+                                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
                                 }
                                 h2 {
-                                    color: #4CAF50;
+                                    color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff3d00'};
                                     text-align: center;
+                                    text-transform: uppercase;
+                                    font-size: 24px;
+                                    letter-spacing: 1px;
                                 }
                                 p {
                                     font-size: 16px;
                                     line-height: 1.6;
+                                    color: #bdbdbd;
                                 }
                                 table {
                                     width: 100%;
-                                    border-collapse: collapse;
                                     margin-top: 20px;
+                                    border-collapse: collapse;
+                                    color: #bdbdbd;
                                 }
                                 th, td {
-                                    padding: 10px;
-                                    text-align: left;
-                                    border: 1px solid #ddd;
+                                    padding: 12px;
+                                    border-bottom: 1px solid #484848;
                                 }
                                 th {
-                                    background-color: #f1f1f1;
+                                    background-color: #333333;
+                                    text-transform: uppercase;
+                                }
+                                td {
+                                    font-weight: bold;
                                 }
                                 .status {
                                     font-weight: bold;
-                                    color: ${currentBuild.currentResult == 'SUCCESS' ? '#4CAF50' : '#FF7043'};
-                                }
-                                .footer {
-                                    margin-top: 20px;
-                                    font-size: 14px;
-                                    color: #888;
-                                    text-align: center;
+                                    color: ${currentBuild.currentResult == 'SUCCESS' ? '#76ff03' : '#ff3d00'};
                                 }
                                 .report-link {
-                                    color: #1a73e8;
+                                    color: #03a9f4;
                                     text-decoration: none;
                                 }
                                 .report-link:hover {
                                     text-decoration: underline;
+                                }
+                                .footer {
+                                    margin-top: 20px;
+                                    text-align: center;
+                                    font-size: 14px;
+                                    color: #9e9e9e;
                                 }
                             </style>
                         </head>
                         <body>
                             <div class="container">
                                 <h2>🚀 Build Status Notification</h2>
-                                <p>Hello Team,</p>
-                                <p>The Jenkins build for the project <strong>${env.JOB_NAME}</strong> has completed.</p>
+                                <p>Dear Team,</p>
+                                <p>The Jenkins build for <strong>${env.JOB_NAME}</strong> has completed. Below are the details:</p>
                                 <table>
                                   <tr>
                                       <th>Build Number</th>
@@ -294,21 +304,22 @@ pipeline {
                                   </tr>
                                   <tr>
                                       <th>Build URL</th>
-                                      <td><a href="${env.BUILD_URL}" class="report-link">Click here to view the build</a></td>
+                                      <td><a href="${env.BUILD_URL}" class="report-link">View Build Details</a></td>
                                   </tr>
                                   <tr>
                                       <th>Result</th>
                                       <td class="status">${currentBuild.currentResult}</td>
                                   </tr>
                                 </table>
-                                <p>Access the reports:</p>
+                                <p>Access the full reports:</p>
                                 <ul>
                                     <li><a href="${env.BUILD_URL}artifact/target/site/jacoco/index.html" class="report-link">📊 JaCoCo Coverage Report</a></li>
                                     <li><a href="/tmp/lynis_reports/lynis-report.html" class="report-link">🛡️ Lynis Security Report</a></li>
+                                    <li><a href="${env.BUILD_URL}artifact/dependency-check-report.html" class="report-link">🔒 OWASP Dependency-Check Report</a></li>
                                 </ul>
-                                <p>${currentBuild.currentResult == 'SUCCESS' ? '🎉 The build has successfully passed!' : '❌ There were issues during the build. Please check the logs for details.'}</p>
+                                <p>${currentBuild.currentResult == 'SUCCESS' ? '🎉 Congratulations! The build succeeded without any issues.' : '❌ The build encountered issues. Please check the reports for further details.'}</p>
                                 <div class="footer">
-                                    <p>Regards,<br/> The Jenkins DevOps Team, ADMIN: RAYEN</p>
+                                    <p>Kind regards,<br/>The Jenkins DevOps Team</p>
                                 </div>
                             </div>
                         </body>
@@ -322,5 +333,6 @@ pipeline {
                 }
             }
         }
-    }
+
+
 }
