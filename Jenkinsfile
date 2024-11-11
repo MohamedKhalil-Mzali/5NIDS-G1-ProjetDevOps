@@ -247,7 +247,7 @@ stage('Make Script Executable') {
     }
 }
 
-       stage('Continuous Scanning and Monitoring - Falco') {
+    stage('Continuous Scanning and Monitoring - Falco') {
     steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             sh '''
@@ -259,7 +259,7 @@ stage('Make Script Executable') {
                     -v /var/run/docker.sock:/var/run/docker.sock \
                     -v /etc/falco:/etc/falco \
                     falcosecurity/falco:latest \
-                    --validate /etc/falco/falco.yaml
+                    /bin/bash -c "falco --validate /etc/falco/falco.yaml"
 
                 # Ensure log directory exists with correct permissions
                 sudo mkdir -p /var/tmp/falco_logs
@@ -289,6 +289,7 @@ stage('Make Script Executable') {
         }
     }
 }
+
 
 stage('Publish Falco Report') {
     steps {
