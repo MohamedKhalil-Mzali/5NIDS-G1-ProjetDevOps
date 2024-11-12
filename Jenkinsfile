@@ -218,25 +218,33 @@ pipeline {
             }
         }
 
-        stage('Send WhatsApp Notification') {
+        stage('Send SMS Notification') {
     steps {
         script {
             // Use withCredentials block to securely inject credentials
             withCredentials([string(credentialsId: 'TWILIO_ACCOUNT_SID', variable: 'TWILIO_ACCOUNT_SID'),
-                             string(credentialsId: 'TWILIO_AUTH_TOKEN', variable: 'TWILIO_AUTH_TOKEN')]) {
-                def message = currentBuild.currentResult == 'SUCCESS' ?
-                    "✅ Build Success: ${currentBuild.fullDisplayName}" :
-                    "❌ Build Failure: ${currentBuild.fullDisplayName}"
+                 string(credentialsId: 'TWILIO_AUTH_TOKEN', variable: 'TWILIO_AUTH_TOKEN')]) {
+    def message = """
+    Build Status: ${currentBuild.currentResult}
+    Build Number: ${currentBuild.number}
+    Project: ${env.JOB_NAME}
+    Duration: ${currentBuild.durationString}
+    Result: ${currentBuild.currentResult == 'SUCCESS' ? '✅ Success' : '❌ Failure'}
 
-                // Send WhatsApp message using Twilio API with curl
-                sh ''' 
-                curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" \
-                    --data-urlencode "To=whatsapp:+21628221389" \
-                    --data-urlencode "From=whatsapp:+12629474415" \
-                    --data-urlencode "Body=${message}" \
-                    -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}
-                '''
-            }
+    More details: ${env.BUILD_URL}
+    """
+    
+    // Send SMS using Twilio API with curl
+    sh ''' 
+    curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" \
+    --data-urlencode "To=+21628221389" \  # Replace with the recipient's phone number
+    --data-urlencode "From=+12629474415" \  # Replace with your Twilio-provisioned number
+    --data-urlencode "Body=${message}" \
+    -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}
+    '''
+}
+
+
         }
     }
 }
