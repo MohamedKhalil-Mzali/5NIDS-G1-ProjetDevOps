@@ -233,7 +233,6 @@ pipeline {
     Result: ${currentBuild.currentResult == 'SUCCESS' ? '✅ Success' : '❌ Failure'}
     
     Commit Message: ${currentBuild.changeSets ? currentBuild.changeSets[0].items[0].msg : 'No changes'}
-    Started By: ${currentBuild.getCause('hudson.model.Cause$UserIdCause').userName}
     Build URL: ${env.BUILD_URL}
     """
 
