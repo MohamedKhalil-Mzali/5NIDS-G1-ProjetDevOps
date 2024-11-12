@@ -245,10 +245,8 @@ pipeline {
     --data-urlencode 'MessagingServiceSid=MG6f26b98c01c74e1ecef4eacb9ccd7b3e' \  # Your Twilio Messaging Service SID
     --data-urlencode 'Body=${message}' \
     -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}
-    """
+"""
 }
-
-
 
         }
     }
