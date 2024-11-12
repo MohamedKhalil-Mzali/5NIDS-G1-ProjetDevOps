@@ -236,24 +236,17 @@ pipeline {
     
     // Send SMS using Twilio API with curl
     sh ''' 
-    curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" \
-    --data-urlencode "To=+21628221389" \  # Replace with the recipient's phone number
-    --data-urlencode "From=+12629474415" \  # Replace with your Twilio-provisioned number
-    --data-urlencode "Body=${message}" \
+    curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" 
+    --data-urlencode "To=+21628221389"  # Replace with the recipient's phone number
+    --data-urlencode "From=+12629474415"  # Replace with your Twilio-provisioned number
+    --data-urlencode "Body=${message}" 
     -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}
     '''
 }
 
-
         }
     }
-}
-
-
-
-
-
-
+        }
 
 stage('Send Email Notification') {
     steps {
