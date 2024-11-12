@@ -224,25 +224,31 @@ pipeline {
             // Use withCredentials block to securely inject credentials
             withCredentials([string(credentialsId: 'TWILIO_ACCOUNT_SID', variable: 'TWILIO_ACCOUNT_SID'),
                  string(credentialsId: 'TWILIO_AUTH_TOKEN', variable: 'TWILIO_AUTH_TOKEN')]) {
+    
     def message = """
     Build Status: ${currentBuild.currentResult}
     Build Number: ${currentBuild.number}
     Project: ${env.JOB_NAME}
     Duration: ${currentBuild.durationString}
     Result: ${currentBuild.currentResult == 'SUCCESS' ? '✅ Success' : '❌ Failure'}
-
-    More details: ${env.BUILD_URL}
-    """
     
+    Commit Message: ${currentBuild.changeSets ? currentBuild.changeSets[0].items[0].msg : 'No changes'}
+    Started By: ${currentBuild.getCause('hudson.model.Cause$UserIdCause').userName}
+    Build URL: ${env.BUILD_URL}
+    """
+
     // Send SMS using Twilio API with curl
-    sh ''' 
-    curl -X POST "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json" 
-    --data-urlencode "To=+21628221389"  # Replace with the recipient's phone number
-    --data-urlencode "From=+12629474415"  # Replace with your Twilio-provisioned number
-    --data-urlencode "Body=${message}" 
+    sh """
+    curl 'https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json' \
+    -X POST \
+    --data-urlencode 'To=+21628221389' \  # Replace with the recipient's phone number
+    --data-urlencode 'MessagingServiceSid=MG6f26b98c01c74e1ecef4eacb9ccd7b3e' \  # Your Twilio Messaging Service SID
+    --data-urlencode 'Body=${message}' \
     -u ${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}
-    '''
+    """
 }
+
+
 
         }
     }
