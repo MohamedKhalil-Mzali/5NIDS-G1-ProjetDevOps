@@ -43,7 +43,7 @@ pipeline {
         
         stage('Generate JaCoCo Coverage Report') {
             steps {
-                sh 'mvn jacoco:report'
+                sh 'mvn jacoco:report -Djacoco.reportFormats=xml'
             }
         }
         
