@@ -171,6 +171,38 @@ pipeline {
                 }
             }
         }
+        stage('Secrets Management Validation') {
+    steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            script {
+                // Validate required environment variables for secrets
+                def requiredSecrets = ['MY_SECRET_KEY', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN']
+                def missingSecrets = []
+                
+                requiredSecrets.each { secret ->
+                    if (!env[secret]) {
+                        missingSecrets.add(secret)
+                    }
+                }
+                
+                if (missingSecrets) {
+                    error("Missing required secrets: ${missingSecrets.join(', ')}")
+                } else {
+                    echo "All required secrets are properly configured."
+                }
+            }
+        }
+    }
+    post {
+        failure {
+            echo 'Secrets management validation failed!'
+        }
+        success {
+            echo 'Secrets management validation passed successfully!'
+        }
+    }
+}
+
         
         stage('Make Script Executable') {
             steps {
@@ -217,6 +249,117 @@ pipeline {
                 }
             }
         }
+        stage('Fault Injection') {
+    steps {
+        script {
+            // Define the target container name
+            def containerName = '5-nids-1-rayen-balghouthi-g1-mysqldb-1' // Adjust to your container
+
+            // Inject a fault using Pumba
+            echo "Injecting a fault into container: ${containerName}"
+            sh "sudo pumba pause --duration 10s ${containerName}"
+        }
+    }
+    post {
+        success {
+            echo 'Fault injection completed successfully.'
+        }
+        failure {
+            echo 'Fault injection failed!'
+        }
+    }
+}
+
+stage('Post-Fault Service Checks') {
+    steps {
+        script {
+            // Jenkins Service Health Check
+            def jenkinsCheck = sh(
+                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:8080",
+                returnStdout: true
+            ).trim()
+            if (jenkinsCheck != '200') {
+                error("Jenkins is not healthy. HTTP status: ${jenkinsCheck}")
+            } else {
+                echo "Jenkins is healthy."
+            }
+
+            // SonarQube Service Health Check
+            def sonarqubeCheck = sh(
+                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:9000",
+                returnStdout: true
+            ).trim()
+            if (sonarqubeCheck != '200') {
+                error("SonarQube is not healthy. HTTP status: ${sonarqubeCheck}")
+            } else {
+                echo "SonarQube is healthy."
+            }
+
+            // Prometheus Service Health Check
+            def prometheusCheck = sh(
+                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:9090/metrics",
+                returnStdout: true
+            ).trim()
+            if (prometheusCheck != '200') {
+                error("Prometheus is not healthy. HTTP status: ${prometheusCheck}")
+            } else {
+                echo "Prometheus is healthy."
+            }
+
+            // Grafana Service Health Check
+            def grafanaCheck = sh(
+                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:3000",
+                returnStdout: true
+            ).trim()
+            if (grafanaCheck != '200') {
+                error("Grafana is not healthy. HTTP status: ${grafanaCheck}")
+            } else {
+                echo "Grafana is healthy."
+            }
+
+            // Nexus Service Health Check
+            def nexusCheck = sh(
+                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:8081",
+                returnStdout: true
+            ).trim()
+            if (nexusCheck != '200') {
+                error("Nexus is not healthy. HTTP status: ${nexusCheck}")
+            } else {
+                echo "Nexus is healthy."
+            }
+        }
+    }
+    post {
+        success {
+            echo 'All services recovered successfully after fault injection.'
+        }
+        failure {
+            echo 'One or more services failed to recover after fault injection!'
+        }
+    }
+}
+        stage('Continuous Scanning and Monitoring') {
+    steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            // Run Falco in a privileged container with necessary mounts
+            sh '''
+                sudo docker run --privileged \
+                    -v /:/host \
+                    -v /proc:/host/proc \
+                    -v /sys:/host/sys \
+                    -v /var/run/docker.sock:/var/run/docker.sock \
+                    -v /etc/falco:/etc/falco \
+                    falcosecurity/falco:latest
+            '''
+        }
+    }
+    post {
+        failure {
+            echo 'Falco monitoring encountered an error!'
+        }
+    }
+}
+
 
         stage('Send SMS Notification') {
     steps {
