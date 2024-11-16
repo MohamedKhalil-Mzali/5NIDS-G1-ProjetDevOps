@@ -338,7 +338,7 @@ pipeline {
                     -v /var/run/docker.sock:/var/run/docker.sock \
                     -v \$(pwd)/falco_logs:/var/log/falco \
                     falcosecurity/falco:latest \
-                    -o json_output=true > falco_logs/falco.json
+                    falco -o json_output=true > falco_logs/falco.json
             """
 
             // Parse the logs and generate a summary report
