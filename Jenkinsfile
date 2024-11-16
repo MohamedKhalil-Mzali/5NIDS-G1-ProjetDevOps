@@ -220,10 +220,10 @@ pipeline {
     steps {
         script {
             // Make sure the smoke test script is executable
-            sh 'chmod +x ./run_smoke_tests.sh'
+            sh 'chmod +x ./run_security_smoke_tests.sh'
 
             // Run the smoke tests
-            sh './run_smoke_tests.sh'
+            sh './run_security_smoke_tests.sh'
         }
     }
     post {
