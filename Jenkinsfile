@@ -171,37 +171,50 @@ pipeline {
                 }
             }
         }
-        stage('Secrets Management Validation') {
+
+
+
+        stage('Secrets Management Report Generation') {
     steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            script {
-                // Validate required environment variables for secrets
-                def requiredSecrets = ['MY_SECRET_KEY', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN']
-                def missingSecrets = []
-                
-                requiredSecrets.each { secret ->
-                    if (!env[secret]) {
-                        missingSecrets.add(secret)
-                    }
-                }
-                
-                if (missingSecrets) {
-                    error("Missing required secrets: ${missingSecrets.join(', ')}")
-                } else {
-                    echo "All required secrets are properly configured."
+        script {
+            // Define the required secrets
+            def requiredSecrets = ['MY_SECRET_KEY', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN']
+            def missingSecrets = []
+            def reportFile = "secrets_management_report.txt"
+            
+            // Check for each required secret
+            requiredSecrets.each { secret ->
+                if (!env[secret]) {
+                    missingSecrets.add(secret)
                 }
             }
-        }
-    }
-    post {
-        failure {
-            echo 'Secrets management validation failed!'
-        }
-        success {
-            echo 'Secrets management validation passed successfully!'
+
+            // Generate the report content
+            def reportContent = """
+            Secrets Management Report:
+            ---------------------------
+            Date: ${new Date().format('yyyy-MM-dd HH:mm:ss')}
+            Required Secrets: ${requiredSecrets.join(', ')}
+            """
+
+            if (missingSecrets) {
+                reportContent += "\nMissing Secrets: ${missingSecrets.join(', ')}\n"
+                reportContent += "Status: FAILURE - Missing required secrets"
+            } else {
+                reportContent += "\nAll required secrets are properly configured.\n"
+                reportContent += "Status: SUCCESS - All secrets are available."
+            }
+
+            // Write the report to a file
+            writeFile file: reportFile, text: reportContent
+
+            // Archive the report so it can be accessed later
+            archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
+            echo "Secrets management report generated: ${reportFile}"
         }
     }
 }
+
 
         
         stage('Make Script Executable') {
