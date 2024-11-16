@@ -171,70 +171,23 @@ pipeline {
                 }
             }
         }
-
-
-
-        stage('Secrets Management Report Generation') {
-    steps {
-        script {
-            // Define the required secrets
-            def requiredSecrets = ['MY_SECRET_KEY', 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN']
-            def missingSecrets = []
-            def reportFile = "secrets_management_report.txt"
-            
-            // Check for each required secret
-            requiredSecrets.each { secret ->
-                if (!env[secret]) {
-                    missingSecrets.add(secret)
+        
+        stage('Make Script Executable') {
+            steps {
+                sh 'chmod +x ./run_security_smoke_tests.sh'
+            }
+        }
+        
+        stage('Security Smoke Tests') {
+            steps {
+                sh './run_security_smoke_tests.sh'
+            }
+            post {
+                failure {
+                    echo 'Security smoke tests failed!'
                 }
             }
-
-            // Generate the report content
-            def reportContent = """
-            Secrets Management Report:
-            ---------------------------
-            Date: ${new Date().format('yyyy-MM-dd HH:mm:ss')}
-            Required Secrets: ${requiredSecrets.join(', ')}
-            """
-
-            if (missingSecrets) {
-                reportContent += "\nMissing Secrets: ${missingSecrets.join(', ')}\n"
-                reportContent += "Status: FAILURE - Missing required secrets"
-            } else {
-                reportContent += "\nAll required secrets are properly configured.\n"
-                reportContent += "Status: SUCCESS - All secrets are available."
-            }
-
-            // Write the report to a file
-            writeFile file: reportFile, text: reportContent
-
-            // Archive the report so it can be accessed later
-            archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
-            echo "Secrets management report generated: ${reportFile}"
         }
-    }
-}
-
-
-      stage('Smoke Test') {
-    steps {
-        script {
-            // Make sure the smoke test script is executable
-            sh 'chmod +x ./run_security_smoke_tests.sh'
-
-            // Run the smoke tests
-            sh './run_security_smoke_tests.sh'
-        }
-    }
-    post {
-        success {
-            echo 'Smoke tests passed. Application is running fine.'
-        }
-        failure {
-            echo 'Smoke tests failed! Please investigate the issue.'
-        }
-    }
-}
 
         stage('Server Hardening Validation - Lynis') {
             steps {
@@ -264,121 +217,6 @@ pipeline {
                 }
             }
         }
-        stage('Fault Injection') {
-    steps {
-        script {
-            // Define the target container name
-            def containerName = '5-nids-1-rayen-balghouthi-g1-mysqldb-1' // Adjust to your container
-
-            // Inject a fault using Pumba
-            echo "Injecting a fault into container: ${containerName}"
-            sh "sudo pumba pause --duration 10s ${containerName}"
-        }
-    }
-    post {
-        success {
-            echo 'Fault injection completed successfully.'
-        }
-        failure {
-            echo 'Fault injection failed!'
-        }
-    }
-}
-    stage('Post-Fault Report Generation') {
-    steps {
-        script {
-            // Create a report file to document the fault injection status
-            def reportFile = "fault_injection_report.txt"
-            def faultInjectionStatus = "Fault injection was performed on the MySQL container."
-            def serviceRecoveryStatus = "Service recovery status: FAILED"
-            
-            // Try to access Jenkins to check service recovery
-            try {
-                // Attempt to curl the Jenkins server to check if it's up
-                def responseCode = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:8080", returnStdout: true).trim()
-                if (responseCode == '200') {
-                    serviceRecoveryStatus = "Service recovery status: SUCCESS"
-                } else {
-                    serviceRecoveryStatus = "Service recovery status: FAILED with HTTP code ${responseCode}"
-                }
-            } catch (Exception e) {
-                serviceRecoveryStatus = "Service recovery status: ERROR - ${e.getMessage()}"
-            }
-
-            // Write the report to a file
-            writeFile file: reportFile, text: """
-            Fault Injection Report:
-            -----------------------
-            Date: ${new Date().format('yyyy-MM-dd HH:mm:ss')}
-            Fault Injected: MySQL container paused for 10 seconds
-            Fault Injection Result: ${faultInjectionStatus}
-            ${serviceRecoveryStatus}
-            """
-
-            // Archive the report so it can be accessed after the build
-            archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
-            echo "Fault injection report generated: ${reportFile}"
-        }
-    }
-}
-
-
-
-        
-        stage('System Health Monitoring - Falco') {
-    steps {
-        script {
-            // Create a directory to store Falco logs
-            sh 'mkdir -p falco_logs'
-
-            // Run Falco and save logs in JSON format
-            sh """
-    sudo docker run --rm --privileged \
-        -v /:/host \
-        -v /proc:/host/proc \
-        -v /sys:/host/sys \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -v \$(pwd)/falco_logs:/var/log/falco \
-        falcosecurity/falco:latest \
-        falco -o json_output=true -o rule_output_limit=100 > falco_logs/falco.json
-"""
-
-
-            // Parse the logs and generate a summary report
-            def falcoLogFile = "falco_logs/falco.json"
-            def reportFile = "falco_system_health_report.txt"
-            def alerts = readJSON(file: falcoLogFile).findAll { it.priority in ['WARNING', 'ERROR', 'CRITICAL'] }
-            def summary = """
-                Falco System Health Report:
-                ---------------------------
-                Date: ${new Date().format('yyyy-MM-dd HH:mm:ss')}
-                Total Events Monitored: ${alerts.size()}
-            """
-            alerts.eachWithIndex { alert, idx ->
-                summary += """
-                Alert #${idx + 1}:
-                Rule: ${alert.rule}
-                Priority: ${alert.priority}
-                Output: ${alert.output}
-                Time: ${alert.time}
-                """
-            }
-            writeFile file: reportFile, text: summary
-
-            // Archive the report
-            archiveArtifacts artifacts: "falco_logs/*, ${reportFile}", allowEmptyArchive: true
-            echo "Falco system health report generated: ${reportFile}"
-        }
-    }
-    post {
-        failure {
-            echo 'Falco encountered an error during monitoring!'
-        }
-    }
-}
-
-
-
 
         stage('Send SMS Notification') {
     steps {
