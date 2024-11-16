@@ -216,23 +216,25 @@ pipeline {
 }
 
 
-        
-        stage('Make Script Executable') {
-            steps {
-                sh 'chmod +x ./run_security_smoke_tests.sh'
-            }
+      stage('Smoke Test') {
+    steps {
+        script {
+            // Make sure the smoke test script is executable
+            sh 'chmod +x ./run_smoke_tests.sh'
+
+            // Run the smoke tests
+            sh './run_smoke_tests.sh'
         }
-        
-        stage('Security Smoke Tests') {
-            steps {
-                sh './run_security_smoke_tests.sh'
-            }
-            post {
-                failure {
-                    echo 'Security smoke tests failed!'
-                }
-            }
+    }
+    post {
+        success {
+            echo 'Smoke tests passed. Application is running fine.'
         }
+        failure {
+            echo 'Smoke tests failed! Please investigate the issue.'
+        }
+    }
+}
 
         stage('Server Hardening Validation - Lynis') {
             steps {
