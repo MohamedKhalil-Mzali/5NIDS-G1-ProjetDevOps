@@ -22,9 +22,9 @@ EXPECTED_RESPONSES=(
   "data_fetched"
 )
 
-# Assuming Basic Authentication
-export API_USERNAME="your_username"
-export API_PASSWORD="your_password"
+# Jenkins Credentials
+export API_USERNAME="admin_rayen"
+export API_PASSWORD="admin"
 
 # Perform smoke tests on endpoints
 for i in "${!TEST_ENDPOINTS[@]}"; do
