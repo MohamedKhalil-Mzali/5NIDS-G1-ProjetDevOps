@@ -323,27 +323,57 @@ pipeline {
 
 
         
-        stage('Continuous Scanning and Monitoring') {
+        stage('System Health Monitoring - Falco') {
     steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            // Run Falco in a privileged container with necessary mounts
-            sh '''
-                sudo docker run --privileged \
+        script {
+            // Create a directory to store Falco logs
+            sh 'mkdir -p falco_logs'
+
+            // Run Falco and save logs in JSON format
+            sh """
+                sudo docker run --rm --privileged \
                     -v /:/host \
                     -v /proc:/host/proc \
                     -v /sys:/host/sys \
                     -v /var/run/docker.sock:/var/run/docker.sock \
-                    -v /etc/falco:/etc/falco \
-                    falcosecurity/falco:latest
-            '''
+                    -v $(pwd)/falco_logs:/var/log/falco \
+                    falcosecurity/falco:latest \
+                    -o json_output=true > falco_logs/falco.json
+            """
+
+            // Parse the logs and generate a summary report
+            def falcoLogFile = "falco_logs/falco.json"
+            def reportFile = "falco_system_health_report.txt"
+            def alerts = readJSON(file: falcoLogFile).findAll { it.priority in ['WARNING', 'ERROR', 'CRITICAL'] }
+            def summary = """
+                Falco System Health Report:
+                ---------------------------
+                Date: ${new Date().format('yyyy-MM-dd HH:mm:ss')}
+                Total Events Monitored: ${alerts.size()}
+            """
+            alerts.eachWithIndex { alert, idx ->
+                summary += """
+                Alert #${idx + 1}:
+                Rule: ${alert.rule}
+                Priority: ${alert.priority}
+                Output: ${alert.output}
+                Time: ${alert.time}
+                """
+            }
+            writeFile file: reportFile, text: summary
+
+            // Archive the report
+            archiveArtifacts artifacts: "falco_logs/*, ${reportFile}", allowEmptyArchive: true
+            echo "Falco system health report generated: ${reportFile}"
         }
     }
     post {
         failure {
-            echo 'Falco monitoring encountered an error!'
+            echo 'Falco encountered an error during monitoring!'
         }
     }
 }
+
 
 
         stage('Send SMS Notification') {
