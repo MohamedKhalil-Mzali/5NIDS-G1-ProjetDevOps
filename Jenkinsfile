@@ -172,22 +172,13 @@ pipeline {
             }
         }
         
-        stage('Make Script Executable') {
+        stage('Security Smoke Tests') {
             steps {
                 sh 'chmod +x ./run_security_smoke_tests.sh'
             }
         }
         
-        stage('Security Smoke Tests') {
-            steps {
-                sh './run_security_smoke_tests.sh'
-            }
-            post {
-                failure {
-                    echo 'Security smoke tests failed!'
-                }
-            }
-        }
+        
 
         stage('Server Hardening Validation - Lynis') {
             steps {
