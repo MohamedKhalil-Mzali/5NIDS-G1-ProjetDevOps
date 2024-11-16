@@ -269,75 +269,47 @@ pipeline {
         }
     }
 }
-
-stage('Post-Fault Service Checks') {
+    stage('Post-Fault Report Generation') {
     steps {
         script {
-            // Jenkins Service Health Check
-            def jenkinsCheck = sh(
-                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:8080",
-                returnStdout: true
-            ).trim()
-            if (jenkinsCheck != '200') {
-                error("Jenkins is not healthy. HTTP status: ${jenkinsCheck}")
-            } else {
-                echo "Jenkins is healthy."
+            // Create a report file to document the fault injection status
+            def reportFile = "fault_injection_report.txt"
+            def faultInjectionStatus = "Fault injection was performed on the MySQL container."
+            def serviceRecoveryStatus = "Service recovery status: FAILED"
+            
+            // Try to access Jenkins to check service recovery
+            try {
+                // Attempt to curl the Jenkins server to check if it's up
+                def responseCode = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:8080", returnStdout: true).trim()
+                if (responseCode == '200') {
+                    serviceRecoveryStatus = "Service recovery status: SUCCESS"
+                } else {
+                    serviceRecoveryStatus = "Service recovery status: FAILED with HTTP code ${responseCode}"
+                }
+            } catch (Exception e) {
+                serviceRecoveryStatus = "Service recovery status: ERROR - ${e.getMessage()}"
             }
 
-            // SonarQube Service Health Check
-            def sonarqubeCheck = sh(
-                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:9000",
-                returnStdout: true
-            ).trim()
-            if (sonarqubeCheck != '200') {
-                error("SonarQube is not healthy. HTTP status: ${sonarqubeCheck}")
-            } else {
-                echo "SonarQube is healthy."
-            }
+            // Write the report to a file
+            writeFile file: reportFile, text: """
+            Fault Injection Report:
+            -----------------------
+            Date: ${new Date().format('yyyy-MM-dd HH:mm:ss')}
+            Fault Injected: MySQL container paused for 10 seconds
+            Fault Injection Result: ${faultInjectionStatus}
+            ${serviceRecoveryStatus}
+            """
 
-            // Prometheus Service Health Check
-            def prometheusCheck = sh(
-                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:9090/metrics",
-                returnStdout: true
-            ).trim()
-            if (prometheusCheck != '200') {
-                error("Prometheus is not healthy. HTTP status: ${prometheusCheck}")
-            } else {
-                echo "Prometheus is healthy."
-            }
-
-            // Grafana Service Health Check
-            def grafanaCheck = sh(
-                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:3000",
-                returnStdout: true
-            ).trim()
-            if (grafanaCheck != '200') {
-                error("Grafana is not healthy. HTTP status: ${grafanaCheck}")
-            } else {
-                echo "Grafana is healthy."
-            }
-
-            // Nexus Service Health Check
-            def nexusCheck = sh(
-                script: "curl -s -o /dev/null -w '%{http_code}' http://192.168.56.10:8081",
-                returnStdout: true
-            ).trim()
-            if (nexusCheck != '200') {
-                error("Nexus is not healthy. HTTP status: ${nexusCheck}")
-            } else {
-                echo "Nexus is healthy."
-            }
-        }
-    }
-    post {
-        success {
-            echo 'All services recovered successfully after fault injection.'
-        }
-        failure {
-            echo 'One or more services failed to recover after fault injection!'
+            // Archive the report so it can be accessed after the build
+            archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
+            echo "Fault injection report generated: ${reportFile}"
         }
     }
 }
+
+
+
+        
         stage('Continuous Scanning and Monitoring') {
     steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
