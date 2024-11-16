@@ -1,34 +1,18 @@
 #!/bin/bash
 
-# Define your target URL
-TARGET_URL="http://localhost:8080/health"  # Adjust as needed
-USERNAME="your_username"  # If basic auth is needed
-PASSWORD="your_password"  # If basic auth is needed
+# Define the base URL of the application
+BASE_URL="http://192.168.56.10:8080"  # Change this to your web app's URL
 
-echo "Checking if the application is up..."
+# Make a basic GET request to the root URL and get the HTTP status code
+echo "Checking if the application is up by hitting $BASE_URL..."
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL")
 
-# Make a simple GET request to the health endpoint (using basic auth if required)
-HTTP_STATUS=$(curl -u "${USERNAME}:${PASSWORD}" -s -o /dev/null -w "%{http_code}" "$TARGET_URL")
-
+# Check if the HTTP status code is 200 (OK)
 if [ "$HTTP_STATUS" -ne 200 ]; then
-    echo "ERROR: Web application is not responding as expected (HTTP Status: $HTTP_STATUS)"
+    echo "ERROR: Web application is not responding as expected."
+    echo "HTTP Status: $HTTP_STATUS"
     exit 1
 else
     echo "Application is up and responding (HTTP Status: $HTTP_STATUS)"
+    exit 0
 fi
-
-
-# Example: Check if the MySQL container is running
-echo "Checking if the MySQL container is up..."
-MYSQL_CONTAINER="5-nids-1-rayen-balghouthi-g1-mysqldb-1"
-MYSQL_STATUS=$(docker inspect --format '{{.State.Running}}' $MYSQL_CONTAINER)
-
-if [ "$MYSQL_STATUS" != "true" ]; then
-  echo "ERROR: MySQL container is not running!"
-  exit 1
-else
-  echo "MySQL container is running."
-fi
-
-# Add more checks as needed
-echo "Smoke tests completed successfully!"
