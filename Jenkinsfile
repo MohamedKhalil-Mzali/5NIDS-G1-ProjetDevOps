@@ -331,15 +331,16 @@ pipeline {
 
             // Run Falco and save logs in JSON format
             sh """
-                sudo docker run --rm --privileged \
-                    -v /:/host \
-                    -v /proc:/host/proc \
-                    -v /sys:/host/sys \
-                    -v /var/run/docker.sock:/var/run/docker.sock \
-                    -v \$(pwd)/falco_logs:/var/log/falco \
-                    falcosecurity/falco:latest \
-                    falco -o json_output=true > falco_logs/falco.json
-            """
+    sudo docker run --rm --privileged \
+        -v /:/host \
+        -v /proc:/host/proc \
+        -v /sys:/host/sys \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v \$(pwd)/falco_logs:/var/log/falco \
+        falcosecurity/falco:latest \
+        falco -o json_output=true -o rule_output_limit=100 > falco_logs/falco.json
+"""
+
 
             // Parse the logs and generate a summary report
             def falcoLogFile = "falco_logs/falco.json"
