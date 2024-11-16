@@ -336,7 +336,7 @@ pipeline {
                     -v /proc:/host/proc \
                     -v /sys:/host/sys \
                     -v /var/run/docker.sock:/var/run/docker.sock \
-                    -v $(pwd)/falco_logs:/var/log/falco \
+                    -v \$(pwd)/falco_logs:/var/log/falco \
                     falcosecurity/falco:latest \
                     -o json_output=true > falco_logs/falco.json
             """
@@ -373,6 +373,7 @@ pipeline {
         }
     }
 }
+
 
 
 
