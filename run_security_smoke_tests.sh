@@ -1,20 +1,22 @@
 #!/bin/bash
 
-# Example Smoke Test Script for checking web application and database
+# Define your target URL
+TARGET_URL="http://localhost:8080/health"  # Adjust as needed
+USERNAME="your_username"  # If basic auth is needed
+PASSWORD="your_password"  # If basic auth is needed
 
-# URL of your deployed app (adjust with your actual URL)
-APP_URL="http://localhost:8080"
-
-# Check if the web app is running (status code 200)
 echo "Checking if the application is up..."
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $APP_URL)
+
+# Make a simple GET request to the health endpoint (using basic auth if required)
+HTTP_STATUS=$(curl -u "${USERNAME}:${PASSWORD}" -s -o /dev/null -w "%{http_code}" "$TARGET_URL")
 
 if [ "$HTTP_STATUS" -ne 200 ]; then
-  echo "ERROR: Web application is not responding as expected (HTTP Status: $HTTP_STATUS)"
-  exit 1
+    echo "ERROR: Web application is not responding as expected (HTTP Status: $HTTP_STATUS)"
+    exit 1
 else
-  echo "Web application is up and responding (HTTP Status: $HTTP_STATUS)"
+    echo "Application is up and responding (HTTP Status: $HTTP_STATUS)"
 fi
+
 
 # Example: Check if the MySQL container is running
 echo "Checking if the MySQL container is up..."
