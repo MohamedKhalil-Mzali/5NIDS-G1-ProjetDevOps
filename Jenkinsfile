@@ -49,6 +49,18 @@ pipeline {
             }
         }
 
+        stage('System Security Check - Lynis') {
+            steps {
+                script {
+                    // Exécution de l'audit de sécurité système avec Lynis
+                    sh 'lynis audit system | tee lynis_audit_output.txt'
+                    
+                    // Archivage des résultats pour consultation ultérieure
+                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
         stage('Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository, skipping tests
