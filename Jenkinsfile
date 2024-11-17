@@ -40,7 +40,7 @@ pipeline {
             }
         }
         
-        stage('Scan') {
+        stage('Scan Sonarqube') {
             steps {
                 // Run SonarQube analysis
                 withSonarQubeEnv('sq1') {
@@ -78,6 +78,16 @@ pipeline {
             }
         }
 
+        stage('Security Scan with Trivy') {
+            steps {
+                script {
+                    // Effectuer un scan avec Trivy pour vérifier la présence de vulnérabilités dans l'image Docker
+                    echo "Lancement du scan de sécurité avec Trivy..."
+                    sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL wajdibenromdhane/gestion-station-ski:1.0.0'
+                }
+            }
+        }
+
         stage('Deploy image') {
             steps {
                 // Push Docker image to Docker Hub
@@ -95,7 +105,7 @@ pipeline {
             }
         }
 
-        stage('Start Monitoring Containers') {
+        stage('Start Monitoring Containers Grafana Prometheus ') {
             steps {
                 // Start specific container by container ID
                 sh 'docker start 40d02048d5f4'
