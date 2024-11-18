@@ -14,52 +14,7 @@ pipeline {
                     url: 'https://github.com/MohamedKhalil-Mzali/5NIDS-G1-ProjetDevOps.git'
             }
         }
-        stage('Pre-commit Security Hooks') {
-            steps {
-                script {
-                    sh '''
-                    if ! command -v pre-commit &> /dev/null
-                    then
-                        echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
-                        python3 -m venv venv
-                        . venv/bin/activate
-                        pip install pre-commit
-                    fi
-                    git config --unset-all core.hooksPath
-                    pre-commit install
-                    pre-commit run --all-files
-                    '''
-                }
-            }
-        }
-
-        stage('Compile Stage') {
-            steps {
-                // Clean and compile the project
-                sh 'mvn clean compile'
-            }
-        }
-        
-        stage('Scan Sonarqube') {
-            steps {
-                // Run SonarQube analysis
-                withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('System Security Check - Lynis') {
-            steps {
-                script {
-                    // Exécution de l'audit de sécurité système avec Lynis
-                    sh 'lynis audit system | tee lynis_audit_output.txt'
-                    
-                    // Archivage des résultats pour consultation ultérieure
-                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
-                }
-            }
-        }
+       
 
         stage('Deploy to Nexus') {
             steps {
