@@ -40,15 +40,6 @@ pipeline {
             }
         }
 
-        stage('Scan') {
-            steps {
-                // Run SonarQube analysis
-                withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
         stage('System Security Check - Lynis') {
             steps {
                 script {
@@ -60,6 +51,16 @@ pipeline {
                 }
             }
         }
+        stage('Scan') {
+            steps {
+                // Run SonarQube analysis
+                withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+     
 
         stage('Deploy to Nexus') {
             steps {
