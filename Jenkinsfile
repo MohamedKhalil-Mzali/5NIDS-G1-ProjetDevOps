@@ -164,15 +164,17 @@ pipeline {
         }
         
         stage('Start Monitoring Containers') {
-            steps {
-                sh 'docker start ghorbalmahdi5gl5-prometheus grafana'
-            }
-            post {
-                failure {
-                    echo 'Failed to start monitoring containers!'
-                }
-            }
+    steps {
+        sh 'docker start ghorbalmahdi5gl5-prometheus-1'
+        sh 'docker start grafana'
+    }
+    post {
+        failure {
+            echo 'Failed to start monitoring containers!'
         }
+    }
+}
+
         
         stage('Security Smoke Tests') {
             steps {
