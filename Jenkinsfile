@@ -113,25 +113,27 @@ pipeline {
             }
         }
         
-        stage('Push Docker Image to Hub') {
-            steps {
-                script {
-                    echo "Attempting Docker login with user: ghorbelmahdi"
-                    withCredentials([usernamePassword(credentialsId: 'Docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_TOKEN')]) {
-                        sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_TOKEN}"
-                        sh 'docker push ghorbelmahdi/gestion-station-ski:1.0.0'
-                    }
-                }
-            }
-            post {
-                success {
-                    echo 'Docker image pushed successfully!'
-                }
-                failure {
-                    echo 'Docker image push failed!'
-                }
+       stage('Push Docker Image to Hub') {
+    steps {
+        script {
+            echo "Attempting Docker login with user: ghorbelmahdi"
+            withCredentials([usernamePassword(credentialsId: 'Docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_TOKEN')]) {
+                // Use --password-stdin for secure login
+                sh "echo ${DOCKER_TOKEN} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                sh 'docker push ghorbelmahdi/gestion-station-ski:1.0.0'
             }
         }
+    }
+    post {
+        success {
+            echo 'Docker image pushed successfully!'
+        }
+        failure {
+            echo 'Docker image push failed!'
+        }
+    }
+}
+
         
         stage('Deploy to Nexus Repository') {
             steps {
